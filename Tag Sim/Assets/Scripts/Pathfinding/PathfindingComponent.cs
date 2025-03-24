@@ -19,16 +19,125 @@ public class PathfindingComponent : MonoBehaviour
 
     private void Update()
     {
-        movementComponent.SetMovementPath(AStar(transform.position, destination));
+        List<GridTile> astarPath = AStar(transform.position, destination);
+        List<GridTile> smoothedPath = SmoothPath(astarPath);
+        movementComponent.SetMovementPath(ConvertTilePathToMovementPath(smoothedPath));
+
+        if(Input.GetMouseButtonDown(0))
+        {
+            Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            destination = mousePos;
+        }
     }
 
-    public List<Vector2> AStar(Vector2 startPosition, Vector2 targetPosition)
+    public List<Vector2> ConvertTilePathToMovementPath(List<GridTile> tilePath)
+    {
+        List<Vector2> movementPath = new List<Vector2>();
+        foreach(GridTile tile in tilePath)
+        {
+            movementPath.Add(tile.WorldPosition);
+        }
+        return movementPath;
+    }
+
+    public List<GridTile> SmoothPath(List<GridTile> rawPath)
     {
         GridComponent grid = GridComponent.Instance;
         if (!grid)
         {
             Debug.Log("No Grid Component found!");
-            return new List<Vector2>();
+            return new List<GridTile>();
+        }
+
+        // Define our line trace function to determine if a straight line can be
+        // drawn between two cells without colliding with a non-traversable cell along
+        // the path.
+        System.Func<GridTile, GridTile, bool> LineTrace = (GridTile start, GridTile end) =>
+        {
+            int x1 = start.GridCoordinate.x, y1 = start.GridCoordinate.y;
+            int x2 = end.GridCoordinate.x, y2 = end.GridCoordinate.y;
+
+            int dx = Mathf.Abs(x2 - x1);
+            int dy = Mathf.Abs(y2 - y1);
+            int sx = (x1 < x2) ? 1 : -1;
+            int sy = (y1 < y2) ? 1 : -1;
+
+            int err = dx - dy;
+
+            while (true)
+            {
+                GridTile currentCell = grid.GetTile(x1, y1);
+
+                // Bounds check
+                if (currentCell == null) return false;
+                    
+                // Traversability check
+                if (!currentCell.Traversable) return false;
+
+                // Success condition
+                if (currentCell == end) return true;
+
+                // Move to the next cell
+                int e2 = 2 * err;
+                if (e2 > -dy)
+                {
+                    err -= dy;
+                    x1 += sx;
+                }
+                if (e2 < dx)
+                {
+                    err += dx;
+                    y1 += sy;
+                }
+            }
+        };
+
+        // Our final path will keep only the steps needed to get to the target
+        List<GridTile> finalPath = new List<GridTile>();
+        if (rawPath.Count <= 2)
+        {
+            finalPath = rawPath;
+        } else
+        {
+            // We iterate through each step of the path, tracing as far down the path as we can
+            // get.
+            for (int i = 0; i < rawPath.Count;)
+            {
+                for (int j = i + 1; j < rawPath.Count; j++)
+                {
+                    // If we find a tile along the path we can't get to, we add the last step
+                    // to our final path and then start again from there.
+                    if (!LineTrace(rawPath[i], rawPath[j]))
+                    {
+                        i = j - 1;
+                        finalPath.Add(rawPath[i]);
+                        break;
+                    }
+                    else if (j == rawPath.Count - 1)
+                    {
+                        // If we've made it from our i-tile to the last tile (destination) without being
+                        // blocked, we add that point in to our final path and exit the search; our
+                        // path is now complete.
+                        i = rawPath.Count;
+                        finalPath.Add(rawPath[j]);
+                    }
+                }
+            }
+        }
+        return finalPath;
+    }
+
+    /// <summary>
+    /// Performs an AStar search from the start to the end position. Returns a list of tiles
+    /// representing the path from the start to the end.
+    /// </summary>
+    public List<GridTile> AStar(Vector2 startPosition, Vector2 targetPosition)
+    {
+        GridComponent grid = GridComponent.Instance;
+        if (!grid)
+        {
+            Debug.Log("No Grid Component found!");
+            return new List<GridTile>();
         }
 
         // Start/end tile of search.
@@ -63,16 +172,16 @@ public class PathfindingComponent : MonoBehaviour
             // If we've found the destination, we're done.
             if (currentTile == finalTile)
             {
-                List<Vector2> stepsOut = new List<Vector2>();
+                List<GridTile> stepsOut = new List<GridTile>();
 
                 // Add in destination tile
-                stepsOut.Add(currentTile.WorldPosition);
+                stepsOut.Add(currentTile);
 
                 while(cameFrom.ContainsKey(currentTile))
                 {
                     currentTile = cameFrom[currentTile];
                     // Add step into the path
-                    stepsOut.Insert(0, currentTile.WorldPosition);
+                    stepsOut.Insert(0, currentTile);
                 }
                 stepsOut.RemoveAt(0);
                 return stepsOut;
@@ -116,6 +225,6 @@ public class PathfindingComponent : MonoBehaviour
         }
 
 
-        return new List<Vector2>();
+        return new List<GridTile>();
     }
 }

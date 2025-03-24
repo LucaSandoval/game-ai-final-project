@@ -9,6 +9,7 @@ public class MovementComponent : MonoBehaviour
 
     private Rigidbody2D rb;
     private List<Vector2> movementPath;
+    private bool moving;
 
     private void Awake()
     {
@@ -18,6 +19,7 @@ public class MovementComponent : MonoBehaviour
 
     public void SetMovementPath(List<Vector2> path)
     {
+        if (moving) return;
         movementPath = path;
     }
 
@@ -25,6 +27,7 @@ public class MovementComponent : MonoBehaviour
     {
         movementPath.Clear();
         rb.linearVelocity = Vector2.zero;
+        moving = false;
     }
 
     private void FixedUpdate()
@@ -41,6 +44,7 @@ public class MovementComponent : MonoBehaviour
                 // Calculate direction vector
                 Vector2 dir = (movementPath[0] - (Vector2)transform.position).normalized;
                 rb.linearVelocity = dir * MovementSpeed;
+                moving = true;
             }
 
         } else
