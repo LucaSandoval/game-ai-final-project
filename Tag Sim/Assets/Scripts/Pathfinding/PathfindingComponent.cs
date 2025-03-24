@@ -30,6 +30,9 @@ public class PathfindingComponent : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Converts a list of grid tiles into a list of world positions for use in the movement component.
+    /// </summary>
     public List<Vector2> ConvertTilePathToMovementPath(List<GridTile> tilePath)
     {
         List<Vector2> movementPath = new List<Vector2>();
@@ -40,6 +43,10 @@ public class PathfindingComponent : MonoBehaviour
         return movementPath;
     }
 
+    /// <summary>
+    /// Given a path of grid tiles, smooths them out by removing uncessesary stepping and leaves
+    /// only the most necessary tiles.
+    /// </summary>
     public List<GridTile> SmoothPath(List<GridTile> rawPath)
     {
         GridComponent grid = GridComponent.Instance;

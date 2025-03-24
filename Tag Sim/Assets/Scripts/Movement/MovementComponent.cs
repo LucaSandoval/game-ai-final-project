@@ -55,19 +55,13 @@ public class MovementComponent : MonoBehaviour
 
     private void Update()
     {
-        if (DebugVisualization)
+        if (DebugVisualization && movementPath.Count > 0)
         {
+            Debug.DrawLine(transform.position, movementPath[0], Color.green);
             for (int i = 0; i < movementPath.Count - 1; i++)
             {
                 Debug.DrawLine(movementPath[i], movementPath[i + 1], Color.green);
             }
         }
-    }
-
-    public void Start()
-    {
-        //List<Vector2> path = new List<Vector2>();
-        //path.Add(GridComponent.Instance.GetGridData().GetTile(0, 0).WorldPosition);
-        //SetMovementPath(path);
     }
 }
