@@ -2,6 +2,10 @@ using UnityEngine;
 using System.Collections.Generic;
 using System;
 
+/// <summary>
+/// Component responsible for all things related to pathfinding an entity, providing AStar, Smoothing,
+/// and other related methods.
+/// </summary>
 public class PathfindingComponent : MonoBehaviour
 {
     private MovementComponent movementComponent;
@@ -19,14 +23,17 @@ public class PathfindingComponent : MonoBehaviour
 
     private void Update()
     {
-        List<GridTile> astarPath = AStar(transform.position, destination);
-        List<GridTile> smoothedPath = SmoothPath(astarPath);
-        movementComponent.SetMovementPath(ConvertTilePathToMovementPath(smoothedPath));
-
-        if(Input.GetMouseButtonDown(0))
+        if (movementComponent)
         {
-            Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            destination = mousePos;
+            List<GridTile> astarPath = AStar(transform.position, destination);
+            List<GridTile> smoothedPath = SmoothPath(astarPath);
+            movementComponent.SetMovementPath(ConvertTilePathToMovementPath(smoothedPath));
+
+            if(Input.GetMouseButtonDown(0))
+            {
+                Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                destination = mousePos;
+            }
         }
     }
 
@@ -233,5 +240,82 @@ public class PathfindingComponent : MonoBehaviour
 
 
         return new List<GridTile>();
+    }
+
+    /// <summary>
+    /// Performs Dijkstra's algorithm across the grid from the given start position. Returns a new GridMap containing
+    /// the Dijkstra values and a map containing the shortests paths (prev).
+    /// </summary>
+    public (GridMap, Dictionary<GridTile, GridTile>) Dijkstra(Vector2 startPosition)
+    {
+        GridComponent grid = GridComponent.Instance;
+        if (!grid)
+        {
+            Debug.Log("No Grid Component found!");
+            return (null, null);
+        }
+
+        // Initialize variables
+        GridTile startingTile = grid.GetGridTileAtWorldPosition(startPosition);
+        GridMap distanceMapOut = new GridMap(grid.GetGridDimensions().Item1, grid.GetGridDimensions().Item2, float.MaxValue);
+        Dictionary<GridTile, GridTile> prev = new Dictionary<GridTile, GridTile>();
+
+        // Define our minimum distance comparator for our heap
+        Comparison<GridTile> CompareMinimumDistance = (GridTile a, GridTile b) =>
+        {
+            float fA = distanceMapOut.GetGridValue(a.GridCoordinate.x, a.GridCoordinate.y);
+            float fB = distanceMapOut.GetGridValue(b.GridCoordinate.x, b.GridCoordinate.y);
+            return fA.CompareTo(fB);
+        };
+
+        //Initialize the distance of our source cell as 0
+        distanceMapOut.SetGridValue(startingTile.GridCoordinate.x, startingTile.GridCoordinate.y, 0);
+
+        // Push the first cell onto the heap
+        PriorityQueue<GridTile> q = new PriorityQueue<GridTile>(CompareMinimumDistance);
+        q.Enqueue(startingTile);
+
+        // Main algorith loop
+        while(q.Count > 0)
+        {
+            // Get lowest fScore cell (most promising) off the heap.
+            GridTile currentTile = q.Dequeue();
+
+            // Tile neighbors
+            List<GridTile> neighbors = new List<GridTile>()
+            {
+                grid.GetTile(currentTile.GridCoordinate.x, currentTile.GridCoordinate.y + 1),
+                grid.GetTile(currentTile.GridCoordinate.x + 1, currentTile.GridCoordinate.y + 1),
+                grid.GetTile(currentTile.GridCoordinate.x + 1, currentTile.GridCoordinate.y),
+                grid.GetTile(currentTile.GridCoordinate.x + 1, currentTile.GridCoordinate.y - 1),
+                grid.GetTile(currentTile.GridCoordinate.x, currentTile.GridCoordinate.y - 1),
+                grid.GetTile(currentTile.GridCoordinate.x - 1, currentTile.GridCoordinate.y - 1),
+                grid.GetTile(currentTile.GridCoordinate.x - 1, currentTile.GridCoordinate.y),
+                grid.GetTile(currentTile.GridCoordinate.x - 1, currentTile.GridCoordinate.y + 1),
+            };
+
+            foreach (GridTile neigbor in neighbors)
+            {
+                // Check if neighbor is within grid bounds
+                if (neigbor == null) continue;
+                // Check if this neighbor is inaccessible
+                if (!neigbor.Traversable) continue;
+
+                // Check if the dist[CurrentCell] + distance from CurrentCell to Neighbor
+                // is less than dist[Neighbor].
+                float Alt = distanceMapOut.GetGridValue(currentTile.GridCoordinate.x, currentTile.GridCoordinate.y);
+                Alt += grid.DistanceBetweenTiles(currentTile, neigbor);
+
+                float OldNeighborDist = distanceMapOut.GetGridValue(neigbor.GridCoordinate.x, neigbor.GridCoordinate.y);
+                if (Alt < OldNeighborDist)
+                {
+                    distanceMapOut.SetGridValue(neigbor.GridCoordinate.x, neigbor.GridCoordinate.y, Alt);
+                    prev[neigbor] = currentTile;
+                    q.Enqueue(neigbor);
+                }
+            }
+        }
+
+        return (distanceMapOut, prev);
     }
 }

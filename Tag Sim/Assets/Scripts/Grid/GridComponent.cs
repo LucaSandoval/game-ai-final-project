@@ -13,8 +13,27 @@ public class GridComponent : Singleton<GridComponent>
     [SerializeField] private bool UseInspectorChildGrid;
     [SerializeField] private GameObject GridParent;
 
+    [SerializeField] private bool DebugDisplayTileValues;
+
     private GridMap mainGrid;
     private Vector2 gridTopLeft, gridBottomRight;
+
+    private GridMap debugGrid;
+    public PathfindingComponent test;
+
+    private void Start()
+    {
+        debugGrid = test.Dijkstra(test.gameObject.transform.position).Item1;
+    }
+
+    private void Update()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            debugGrid = test.Dijkstra(mousePos).Item1;
+        }
+    }
 
     protected override void Awake()
     {
@@ -52,6 +71,14 @@ public class GridComponent : Singleton<GridComponent>
 
             mainGrid = new GridMap(Width, Height, newGridTiles);
         }
+    }
+
+    /// <summary>
+    /// Returns a tuple containing the width and height of the grid.
+    /// </summary>
+    public (int, int) GetGridDimensions()
+    {
+        return (Width, Height);
     }
 
     /// <summary>
@@ -104,5 +131,26 @@ public class GridComponent : Singleton<GridComponent>
     {
         if (tile1 == null || tile2 == null) return -1;
         return Vector2.Distance(tile1.WorldPosition, tile2.WorldPosition);
+    }
+
+    private void OnGUI()
+    {
+        if (DebugDisplayTileValues && debugGrid != null)
+        {
+            GUIStyle style = new GUIStyle();
+            style.fontSize = 90;  // Increase font size
+            style.normal.textColor = Color.black; // Set text color to black
+
+            for (int h = 0; h < Height; h++)
+            {
+                for (int w = 0; w < Width; w++)
+                {
+                    if (debugGrid.GetTile(w, h).Value == float.MaxValue) continue;
+                    Vector2 screenPos = Camera.main.WorldToScreenPoint(mainGrid.GetTile(w, h).WorldPosition);
+                    float flippedY = Screen.height - screenPos.y;
+                    GUI.Label(new Rect(screenPos.x - 20, flippedY + 20, 500, 500), debugGrid.GetTile(w, h).Value.ToString("F1"), style);
+                }
+            }
+        }
     }
 }
