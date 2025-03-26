@@ -179,6 +179,8 @@ public class PathfindingComponent : MonoBehaviour
         PriorityQueue<GridTile> openSet = new PriorityQueue<GridTile>(compareFScore);
         openSet.Enqueue(startTile);
 
+        //Debug.Log($"Starting AStar from {startTile.GridCoordinate.x}, {startTile.GridCoordinate.y} to {finalTile.GridCoordinate.x}, {finalTile.GridCoordinate.y}");
+
         while (openSet.Count > 0)
         {
             // Get lowest fScore cell (most promising) off the heap.
@@ -238,7 +240,7 @@ public class PathfindingComponent : MonoBehaviour
             }
         }
 
-
+        //Debug.Log("No path found!");
         return new List<GridTile>();
     }
 
@@ -259,6 +261,8 @@ public class PathfindingComponent : MonoBehaviour
         GridTile startingTile = grid.GetGridTileAtWorldPosition(startPosition);
         GridMap distanceMapOut = new GridMap(grid.GetGridDimensions().Item1, grid.GetGridDimensions().Item2, float.MaxValue);
         Dictionary<GridTile, GridTile> prev = new Dictionary<GridTile, GridTile>();
+
+        //Debug.Log($"Starting Dijkstra from {startingTile.GridCoordinate.x}, {startingTile.GridCoordinate.y}");
 
         // Define our minimum distance comparator for our heap
         Comparison<GridTile> CompareMinimumDistance = (GridTile a, GridTile b) =>
@@ -315,7 +319,6 @@ public class PathfindingComponent : MonoBehaviour
                 }
             }
         }
-
         return (distanceMapOut, prev);
     }
 }

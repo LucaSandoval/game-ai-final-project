@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 13312, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: placeholder_sprites1_0_tilemap
+  m_Name: Wall
   m_EditorClassIdentifier: 
-  m_Sprite: {fileID: -9044160833129975768, guid: 41e1b3c25e816c74f9ce9f961bd92c14, type: 3}
+  m_Sprite: {fileID: -8247274824585164798, guid: b40d1fac27912ca4eb8ff056731d79c8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Transform:
     e00: 1

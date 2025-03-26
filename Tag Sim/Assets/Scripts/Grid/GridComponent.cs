@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 /// <summary>
 /// Component that manages a gridMap as a physical grid within the world, with tiles occupying space.
@@ -6,17 +7,17 @@ using UnityEngine;
 /// </summary>
 public class GridComponent : Singleton<GridComponent>
 {
-    [SerializeField] private int Width;
-    [SerializeField] private int Height;
     [SerializeField] private float TileWorldSize;
 
     [SerializeField] private bool UseInspectorChildGrid;
     [SerializeField] private GameObject GridParent;
 
     [SerializeField] private bool DebugDisplayTileValues;
+    [SerializeField] private Tilemap tilemap;
 
     private GridMap mainGrid;
     private Vector2 gridTopLeft, gridBottomRight;
+    private int Width, Height;
 
     private GridMap debugGrid;
     public PathfindingComponent test;
@@ -39,14 +40,55 @@ public class GridComponent : Singleton<GridComponent>
     {
         base.Awake();
 
-        // DEBUG: Use tiles in the inspector to create our grid for easier testing
-        if (UseInspectorChildGrid && GridParent)
+        if (tilemap != null)
+        {
+            BoundsInt bounds = tilemap.cellBounds;
+            Width = bounds.size.x;
+            Height = bounds.size.y;
+
+            GridTile[,] newGridTiles = new GridTile[Width, Height];
+            Debug.Log($"GridComponent: Creating grid with dimensions ({Width}, {Height})");
+
+            for (int y = bounds.yMin; y < bounds.yMax; y++)
+            {
+                for (int x = bounds.xMin; x < bounds.xMax; x++)
+                {
+                    Vector3Int tilePosition = new Vector3Int(x, y, 0);
+                    TileBase tile = tilemap.GetTile(tilePosition);
+
+                    if (tile != null)
+                    {
+                        GridTile newTile = new GridTile();
+                        newTile.WorldPosition = tilemap.CellToWorld(tilePosition) + new Vector3(TileWorldSize / 2, TileWorldSize / 2, 0);
+                        newTile.GridCoordinate = new Vector2Int(x - bounds.xMin, y - bounds.yMin);
+                        newTile.Traversable = !tilemap.GetTile(tilePosition).name.Contains("Wall");
+
+                        newGridTiles[x - bounds.xMin, y - bounds.yMin] = newTile;
+
+                        Debug.Log($"Created tile at ({x - bounds.xMin}, {y - bounds.yMin}): WorldPosition={newTile.WorldPosition}, Traversable={newTile.Traversable}");
+                    }
+                    else
+                    {
+                        newGridTiles[x - bounds.xMin, y - bounds.yMin] = null;
+                    }
+                }
+            }
+
+            float halfTileWidth = TileWorldSize / 2;
+            gridTopLeft = new Vector2(newGridTiles[0, Height - 1].WorldPosition.x - halfTileWidth, 
+                newGridTiles[0, Height - 1].WorldPosition.y + halfTileWidth);
+            gridBottomRight = new Vector2(newGridTiles[Width - 1, 0].WorldPosition.x + halfTileWidth, 
+                newGridTiles[Width - 1, 0].WorldPosition.y - halfTileWidth);
+
+            mainGrid = new GridMap(Width, Height, newGridTiles);
+        }
+        else if (UseInspectorChildGrid && GridParent)
         {
             GridTile[,] newGridTiles = new GridTile[Width, Height];
             int childId = 0;
-            for(int h = 0; h < Height; h++)
+            for (int h = 0; h < Height; h++)
             {
-                for(int w = 0; w < Width; w++)
+                for (int w = 0; w < Width; w++)
                 {
                     GridTile newTile = new GridTile();
                     newTile.WorldPosition = GridParent.transform.GetChild(childId).position;
@@ -120,7 +162,6 @@ public class GridComponent : Singleton<GridComponent>
         {
             return null;
         }
-
         return mainGrid.GetTile(column, row);
     }
 
