@@ -18,7 +18,7 @@ public class PathfindingComponent : MonoBehaviour
 
     private void Start()
     {
-        destination = GridComponent.Instance.GetTile(5, 3).WorldPosition;
+        destination = GridComponent.Instance.GetTile(7, 3).WorldPosition;
     }
 
     private void Update()
@@ -179,7 +179,7 @@ public class PathfindingComponent : MonoBehaviour
         PriorityQueue<GridTile> openSet = new PriorityQueue<GridTile>(compareFScore);
         openSet.Enqueue(startTile);
 
-        //Debug.Log($"Starting AStar from {startTile.GridCoordinate.x}, {startTile.GridCoordinate.y} to {finalTile.GridCoordinate.x}, {finalTile.GridCoordinate.y}");
+        Debug.Log($"Starting AStar from {startTile.GridCoordinate.x}, {startTile.GridCoordinate.y} to {finalTile.GridCoordinate.x}, {finalTile.GridCoordinate.y}");
 
         while (openSet.Count > 0)
         {
@@ -189,6 +189,7 @@ public class PathfindingComponent : MonoBehaviour
             if (currentTile == finalTile)
             {
                 List<GridTile> stepsOut = new List<GridTile>();
+                Debug.Log($"Path found! {currentTile.GridCoordinate.x}, {currentTile.GridCoordinate.y}");
 
                 // Add in destination tile
                 stepsOut.Add(currentTile);

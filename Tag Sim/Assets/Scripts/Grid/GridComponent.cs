@@ -65,7 +65,7 @@ public class GridComponent : Singleton<GridComponent>
 
                         newGridTiles[x - bounds.xMin, y - bounds.yMin] = newTile;
 
-                        Debug.Log($"Created tile at ({x - bounds.xMin}, {y - bounds.yMin}): WorldPosition={newTile.WorldPosition}, Traversable={newTile.Traversable}");
+                        //Debug.Log($"Created tile at ({x - bounds.xMin}, {y - bounds.yMin}): WorldPosition={newTile.WorldPosition}, Traversable={newTile.Traversable}");
                     }
                     else
                     {
@@ -179,7 +179,7 @@ public class GridComponent : Singleton<GridComponent>
         if (DebugDisplayTileValues && debugGrid != null)
         {
             GUIStyle style = new GUIStyle();
-            style.fontSize = 90;  // Increase font size
+            style.fontSize = 50;  // Increase font size
             style.normal.textColor = Color.black; // Set text color to black
 
             for (int h = 0; h < Height; h++)
