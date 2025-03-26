@@ -18,8 +18,7 @@ public class PathfindingComponent : MonoBehaviour
 
     private void Start()
     {
-        destination = GridComponent.Instance.GetTile(8, 12).WorldPosition;
-        Debug.Log($"Destination set to {destination.x}, {destination.y}");
+        destination = GridComponent.Instance.GetTile(0, 0).WorldPosition;
     }
 
     private void Update()
@@ -69,47 +68,18 @@ public class PathfindingComponent : MonoBehaviour
         // the path.
         System.Func<GridTile, GridTile, bool> LineTrace = (GridTile start, GridTile end) =>
         {
-            int x1 = start.GridCoordinate.x, y1 = start.GridCoordinate.y;
-            int x2 = end.GridCoordinate.x, y2 = end.GridCoordinate.y;
-
-            int dx = Mathf.Abs(x2 - x1);
-            int dy = Mathf.Abs(y2 - y1);
-            int sx = (x1 < x2) ? 1 : -1;
-            int sy = (y1 < y2) ? 1 : -1;
-
-            int err = dx - dy;
-
-            while (true)
+            Vector2 dir = (end.WorldPosition - start.WorldPosition);
+            RaycastHit2D[] hits = Physics2D.RaycastAll(start.WorldPosition, dir.normalized, dir.magnitude);
+            foreach (RaycastHit2D hit in hits)
             {
-                GridTile currentCell = grid.GetTile(x1, y1);
-
-                // Bounds check
-                if (currentCell == null) return false;
-                    
-                // Traversability check
-                if (!currentCell.Traversable) return false;
-
-                // Success condition
-                if (currentCell == end) return true;
-
-                // Move to the next cell
-                int e2 = 2 * err;
-                if (e2 > -dy)
-                {
-                    err -= dy;
-                    x1 += sx;
-                }
-                if (e2 < dx)
-                {
-                    err += dx;
-                    y1 += sy;
-                }
+                if (hit.transform.CompareTag("Wall")) return false;
             }
+            return true;
         };
 
         // Our final path will keep only the steps needed to get to the target
         List<GridTile> finalPath = new List<GridTile>();
-        if (rawPath.Count <= 2)
+        if (rawPath.Count <= 2 || !LineTrace(grid.GetGridTileAtWorldPosition(transform.position), rawPath[1]))
         {
             finalPath = rawPath;
         } else
@@ -180,8 +150,6 @@ public class PathfindingComponent : MonoBehaviour
         PriorityQueue<GridTile> openSet = new PriorityQueue<GridTile>(compareFScore);
         openSet.Enqueue(startTile);
 
-        //Debug.Log($"Starting AStar from {startTile.GridCoordinate.x}, {startTile.GridCoordinate.y} to {finalTile.GridCoordinate.x}, {finalTile.GridCoordinate.y}");
-
         while (openSet.Count > 0)
         {
             // Get lowest fScore cell (most promising) off the heap.
@@ -190,7 +158,6 @@ public class PathfindingComponent : MonoBehaviour
             if (currentTile == finalTile)
             {
                 List<GridTile> stepsOut = new List<GridTile>();
-                //Debug.Log($"Path found! {currentTile.GridCoordinate.x}, {currentTile.GridCoordinate.y}");
 
                 // Add in destination tile
                 stepsOut.Add(currentTile);
@@ -242,7 +209,7 @@ public class PathfindingComponent : MonoBehaviour
             }
         }
 
-        //Debug.Log("No path found!");
+
         return new List<GridTile>();
     }
 
@@ -263,8 +230,6 @@ public class PathfindingComponent : MonoBehaviour
         GridTile startingTile = grid.GetGridTileAtWorldPosition(startPosition);
         GridMap distanceMapOut = new GridMap(grid.GetGridDimensions().Item1, grid.GetGridDimensions().Item2, float.MaxValue);
         Dictionary<GridTile, GridTile> prev = new Dictionary<GridTile, GridTile>();
-
-        //Debug.Log($"Starting Dijkstra from {startingTile.GridCoordinate.x}, {startingTile.GridCoordinate.y}");
 
         // Define our minimum distance comparator for our heap
         Comparison<GridTile> CompareMinimumDistance = (GridTile a, GridTile b) =>
@@ -321,6 +286,7 @@ public class PathfindingComponent : MonoBehaviour
                 }
             }
         }
+
         return (distanceMapOut, prev);
     }
 }
