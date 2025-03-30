@@ -9,11 +9,18 @@ using System;
 public class PathfindingComponent : MonoBehaviour
 {
     private MovementComponent movementComponent;
+    private PlayerController playerController;
     private Vector2 destination;
+
+    [SerializeField] private bool isPlayer = false;
 
     private void Awake()
     {
         movementComponent = GetComponent<MovementComponent>();
+        if (isPlayer)
+        {
+            playerController = GetComponent<PlayerController>();
+        }
     }
 
     private void Start()
@@ -28,11 +35,36 @@ public class PathfindingComponent : MonoBehaviour
             List<GridTile> astarPath = AStar(transform.position, destination);
             List<GridTile> smoothedPath = SmoothPath(astarPath);
             movementComponent.SetMovementPath(ConvertTilePathToMovementPath(smoothedPath));
+            
 
             if(Input.GetMouseButtonDown(0))
             {
                 Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                 destination = mousePos;
+            }
+            else if ((Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow)) && isPlayer)
+            {
+                Debug.Log("Player is moving UP");
+                Vector2 targetPos = playerController.getDestination(KeyCode.W);
+                destination = targetPos;
+            }
+            else if ((Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow)) && isPlayer)
+            {
+                Debug.Log("Player is moving LEFT");
+                Vector2 targetPos = playerController.getDestination(KeyCode.A);
+                destination = targetPos;
+            }
+            else if ((Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow)) && isPlayer)
+            {
+                Debug.Log("Player is moving DOWN");
+                Vector2 targetPos = playerController.getDestination(KeyCode.S);
+                destination = targetPos;
+            }
+            else if ((Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow)) && isPlayer) 
+            {
+                Debug.Log("Player is moving RIGHT");
+                Vector2 targetPos = playerController.getDestination(KeyCode.D);
+                destination = targetPos;
             }
         }
     }

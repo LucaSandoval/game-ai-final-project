@@ -11,6 +11,10 @@ public class MovementComponent : MonoBehaviour
     private List<Vector2> movementPath;
     private bool moving;
 
+
+    //Debugging
+    [SerializeField] private bool isEnemy;
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -25,6 +29,13 @@ public class MovementComponent : MonoBehaviour
 
     public void StopMovement()
     {
+        if (isEnemy)
+        {
+            Debug.Log("Enemy stopping movement at: " + movementPath[0].ToString());
+        } else
+        {
+            Debug.Log("Player stopping movement at: " + movementPath[0].ToString());
+        }
         movementPath.Clear();
         rb.linearVelocity = Vector2.zero;
         moving = false;

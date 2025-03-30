@@ -9,4 +9,8 @@ public class GridTile
     public bool Traversable;
     public Vector2 WorldPosition;
     public Vector2Int GridCoordinate;
+
+    // Player controller stuff
+    public bool IsOccupied;
+    public GameObject Occupant;
 }
