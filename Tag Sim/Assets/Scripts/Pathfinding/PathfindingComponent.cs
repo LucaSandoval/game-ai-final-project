@@ -19,7 +19,7 @@ public class PathfindingComponent : MonoBehaviour
     private void Start()
     {
         destination = GridComponent.Instance.GetTile(0, 0).WorldPosition;
-        Debug.Log($"Destination set to {destination.x}, {destination.y}");
+        // Debug.Log($"Destination set to {destination.x}, {destination.y}");
     }
 
     private void Update()
@@ -112,7 +112,7 @@ public class PathfindingComponent : MonoBehaviour
 
         // Our final path will keep only the steps needed to get to the target
         List<GridTile> finalPath = new List<GridTile>();
-        if (rawPath.Count <= 2 )
+        if (rawPath.Count <= 2 || !LineTrace(grid.GetGridTileAtWorldPosition(transform.position), rawPath[1]))
         {
             finalPath = rawPath;
         } else
@@ -323,7 +323,7 @@ public class PathfindingComponent : MonoBehaviour
                     prev[neighbor] = currentTile;
 
                     // Add debug log for the updated tile
-                    // Debug.Log($"Updated tile at ({neighbor.GridCoordinate.x}, {neighbor.GridCoordinate.y}) with value {Alt}");
+                    Debug.Log($"Updated tile at ({neighbor.GridCoordinate.x}, {neighbor.GridCoordinate.y}) with value {Alt}");
 
                     q.Enqueue(neighbor);
                 }
