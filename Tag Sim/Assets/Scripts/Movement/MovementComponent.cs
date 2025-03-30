@@ -29,13 +29,13 @@ public class MovementComponent : MonoBehaviour
 
     public void StopMovement()
     {
-        if (isEnemy)
-        {
-            Debug.Log("Enemy stopping movement at: " + movementPath[0].ToString());
-        } else
-        {
-            Debug.Log("Player stopping movement at: " + movementPath[0].ToString());
-        }
+        //if (isEnemy)
+        //{
+        //    Debug.Log("Enemy stopping movement at: " + movementPath[0].ToString());
+        //} else
+        //{
+        //    Debug.Log("Player stopping movement at: " + movementPath[0].ToString());
+        //}
         movementPath.Clear();
         rb.linearVelocity = Vector2.zero;
         moving = false;
