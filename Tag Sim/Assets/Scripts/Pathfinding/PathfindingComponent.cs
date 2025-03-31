@@ -13,7 +13,6 @@ public class PathfindingComponent : MonoBehaviour
     private Vector2 destination;
 
     [SerializeField] private bool isPlayer = false;
-    private KeyCode playerKeyPress;
 
     private void Awake()
     {
