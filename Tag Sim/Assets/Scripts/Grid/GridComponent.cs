@@ -65,6 +65,12 @@ public class GridComponent : Singleton<GridComponent>
 
                         newGridTiles[x - bounds.xMin, y - bounds.yMin] = newTile;
 
+                        if (tile.name == "Water")
+                        {
+                            Debug.Log($"Tile at ({x - bounds.xMin}, {y - bounds.yMin}) is Water. Setting value to 2.");
+                            newTile.Value = 2; 
+                        }
+
                         //Debug.Log($"Created tile at ({x - bounds.xMin}, {y - bounds.yMin}): WorldPosition={newTile.WorldPosition}, Traversable={newTile.Traversable}");
                     }
                     else
