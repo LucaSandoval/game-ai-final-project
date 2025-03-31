@@ -85,5 +85,21 @@ public class PerceptionComponent : MonoBehaviour
     {
         return visibleTiles;
     }
+
+    /// <summary>
+    /// Draws the AI's vision radius and field of view in the editor.
+    /// </summary>
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, maxVisionRadius);
+
+        Gizmos.color = Color.blue;
+        Vector3 leftSide = Quaternion.Euler(0, 0, visionAngle / 2) * transform.right * maxVisionRadius;
+        Vector3 rightSide = Quaternion.Euler(0, 0, -visionAngle / 2) * transform.right * maxVisionRadius;
+
+        Gizmos.DrawLine(transform.position, transform.position + leftSide);
+        Gizmos.DrawLine(transform.position, transform.position + rightSide);
+    }
 }
 
