@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 
 /// <summary>
-/// Generic Grid class we can use for pathfinding, spacial functions, and o-map (hopefully.)
+/// Generic Grid class with (0,0) as the bottom-left tile.
 /// </summary>
 public class GridMap
 {
@@ -11,7 +11,7 @@ public class GridMap
 
 
     /// <summary>
-    /// Constructor for creating blank new tiles to fill the grid.
+    /// Constructor for creating blank tiles with (0,0) at bottom-left.
     /// </summary>
     public GridMap(int w, int h)
     {
@@ -19,18 +19,19 @@ public class GridMap
         height = h;
 
         tiles = new GridTile[w, h];
-        for (int i = 0; i < height; i++)
+        for (int i = 0; i < height; i++)  // Iterate rows
         {
-            for (int j = 0; j < width; j++)
+            for (int j = 0; j < width; j++)  // Iterate columns
             {
-                tiles[j, i] = new GridTile();
-                tiles[j, i].GridCoordinate = new Vector2Int(j, i);
+                int adjustedY = height - 1 - i;  // Flip the Y index
+                tiles[j, adjustedY] = new GridTile();
+                tiles[j, adjustedY].GridCoordinate = new Vector2Int(j, i);  // Assign correct logical coordinates
             }
         }
     }
 
     /// <summary>
-    /// Constructor for creating blank new tiles to fill the grid and set to given default value.
+    /// Constructor for setting default tile values with (0,0) at bottom-left.
     /// </summary>
     public GridMap(int w, int h, float value)
     {
@@ -42,15 +43,16 @@ public class GridMap
         {
             for (int j = 0; j < width; j++)
             {
-                tiles[j, i] = new GridTile();
-                tiles[j, i].GridCoordinate = new Vector2Int(j, i);
-                tiles[j, i].Value = value;
+                int adjustedY = height - 1 - i;
+                tiles[j, adjustedY] = new GridTile();
+                tiles[j, adjustedY].GridCoordinate = new Vector2Int(j, i);
+                tiles[j, adjustedY].Value = value;
             }
         }
     }
 
     /// <summary>
-    /// Constructor which assumes tiles have been initialized elsewhere.
+    /// Constructor assuming tiles have been initialized elsewhere.
     /// </summary>
     public GridMap(int w, int h, GridTile[,] tiles)
     {
@@ -68,7 +70,7 @@ public class GridMap
     }
 
     /// <summary>
-    /// Returns a reference to the tile at the given grid coordinate, or null if not found.
+    /// Returns a reference to the tile at the given grid coordinate, or null if out of bounds.
     /// </summary>
     public GridTile GetTile(int w, int h)
     {
