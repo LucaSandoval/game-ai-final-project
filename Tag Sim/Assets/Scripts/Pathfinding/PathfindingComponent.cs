@@ -11,15 +11,30 @@ public class PathfindingComponent : MonoBehaviour
     private MovementComponent movementComponent;
     private Vector2 destination;
 
+    [SerializeField] private bool isPlayer = false;
+    private PlayerController playerController;
+
     private void Awake()
     {
         movementComponent = GetComponent<MovementComponent>();
+
+        if (isPlayer)
+        {
+            playerController = GetComponent<PlayerController>();
+        }
     }
 
     private void Start()
     {
-        destination = GridComponent.Instance.GetTile(0, 0).WorldPosition;
-        // Debug.Log($"Destination set to {destination.x}, {destination.y}");
+        if (isPlayer == false)
+        {
+            destination = GridComponent.Instance.GetTile(0, 0).WorldPosition;
+        }
+        else
+        {
+            destination = GridComponent.Instance.GetTile(1, 0).WorldPosition;
+        }
+
     }
 
     private void Update()
@@ -37,7 +52,18 @@ public class PathfindingComponent : MonoBehaviour
                 //Debug.Log($"Destination set to {destination.x}, {destination.y}");
 
                 // Get the grid tile at the clicked position
+             }
+
+            // Player Movement
+            if (isPlayer)
+            {
+                Vector2 targetPos = playerController.getDestination();
+
+                if (targetPos != destination)
+                {
+                    destination = targetPos;
                 }
+            }
         }
     }
 
