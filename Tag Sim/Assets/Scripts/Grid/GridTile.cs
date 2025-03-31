@@ -7,6 +7,8 @@ public class GridTile
 {
     public float Value;
     public bool Traversable;
+    public bool Occupied;
+    public bool Visible;
     public Vector2 WorldPosition;
     public Vector2Int GridCoordinate;
 }

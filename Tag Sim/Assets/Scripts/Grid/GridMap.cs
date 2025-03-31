@@ -9,6 +9,7 @@ public class GridMap
     private int width, height;
     private GridTile[,] tiles;
 
+
     /// <summary>
     /// Constructor for creating blank new tiles to fill the grid.
     /// </summary>
@@ -91,5 +92,27 @@ public class GridMap
     {
         if (!IsCoordinateWithinGrid(w, h)) return -1f;
         return tiles[w, h].Value;
+    }
+
+    /// <summary>
+    /// Marks a tile as occupied or unoccupied.
+    /// </summary>
+    public void SetTileOccupied(int x, int y, bool occupied)
+    {
+        if (IsCoordinateWithinGrid(x, y))
+        {
+            tiles[x, y].Occupied = occupied;
+        }
+    }
+
+    /// <summary>
+    /// Marks a tile as visible or hidden.
+    /// </summary>
+    public void SetTileVisible(int x, int y, bool visible)
+    {
+        if (IsCoordinateWithinGrid(x, y))
+        {
+            tiles[x, y].Visible = visible;
+        }
     }
 }
