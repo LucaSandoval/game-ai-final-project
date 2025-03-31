@@ -19,7 +19,7 @@ public class PlayerController : MonoBehaviour
     }
 
 
-    // This actually makes the player move
+    // Get the destination of the player based on the key pressed
     // NOTE: Up and Down are reversed because of the way the grid is set up
     public Vector2 getDestination(KeyCode keyCode)
     {
