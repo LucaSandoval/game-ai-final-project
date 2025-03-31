@@ -51,31 +51,14 @@ public class PathfindingComponent : MonoBehaviour
                 Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                 destination = mousePos;
             }
-            // Detection for player movement input
-            else if (isPlayer)
+
+            if (isPlayer)
             {
-                bool keyPressed = false;
+                Vector2 targetPos = playerController.getDestination();
 
-                foreach (KeyCode key in Enum.GetValues(typeof(KeyCode)))
+                if (targetPos != destination)
                 {
-                    if (Input.GetKey(key))
-                    {
-                        playerKeyPress = key;
-                        Vector2 targetPos = playerController.getDestination(playerKeyPress);
-
-                        if (targetPos != destination)
-                        {
-                            destination = targetPos;
-                        }
-
-                        keyPressed = true;
-                        break;
-                    }
-                }
-
-                if (!keyPressed)
-                {
-                    playerKeyPress = KeyCode.None;
+                    destination = targetPos;
                 }
             }
         }
