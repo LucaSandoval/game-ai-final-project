@@ -63,14 +63,10 @@ public class GridComponent : Singleton<GridComponent>
                         newTile.WorldPosition = tilemap.CellToWorld(tilePosition) + new Vector3(TileWorldSize / 2, TileWorldSize / 2, 0);
                         newTile.GridCoordinate = new Vector2Int(x - bounds.xMin, y - bounds.yMin);
                         newTile.Traversable = !tilemap.GetTile(tilePosition).name.Contains("Wall");
+                        newTile.PlayerTraversable = !tilemap.GetTile(tilePosition).name.Contains("Player");
+                        newTile.EnemyTraversable = !tilemap.GetTile(tilePosition).name.Contains("Enemy");
 
                         newGridTiles[x - bounds.xMin, y - bounds.yMin] = newTile;
-
-                        if (tile.name == "Water")
-                        {
-                            // Debug.Log($"Tile at ({x - bounds.xMin}, {y - bounds.yMin}) is Water. Setting value to 2.");
-                            newTile.Value = 2; 
-                        }
                     }
                     else
                     {

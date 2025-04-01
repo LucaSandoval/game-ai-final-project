@@ -113,7 +113,7 @@ public class PathfindingComponent : MonoBehaviour
                 if (currentCell == null) return false;
                     
                 // Traversability check
-                if (!currentCell.Traversable) return false;
+                if (!currentCell.Traversable || !currentCell.EnemyTraversable) return false;
 
                 // Success condition
                 if (currentCell == end) return true;
@@ -248,7 +248,12 @@ public class PathfindingComponent : MonoBehaviour
                 // Check if neighbor is within grid bounds
                 if (neigbor == null) continue;
                 // Check if this neighbor is inaccessible
-                if (!neigbor.Traversable) continue;
+                if (!neigbor.Traversable || (!neigbor.EnemyTraversable && !isPlayer)) continue;
+
+                if (!neigbor.PlayerTraversable && isPlayer)
+                {
+                    continue;
+                }
 
                 float tentativeGScore = gScore[currentTile] + grid.DistanceBetweenTiles(currentTile, neigbor);
                 // Check if this path to the neighbor is better than any previous one
@@ -330,7 +335,7 @@ public class PathfindingComponent : MonoBehaviour
                 // Check if neighbor is within grid bounds
                 if (neighbor == null) continue;
                 // Check if this neighbor is inaccessible
-                if (!neighbor.Traversable) continue;
+                if (!neighbor.Traversable || (!neighbor.EnemyTraversable && !isPlayer)) continue;
 
                 // Check if the dist[CurrentCell] + distance from CurrentCell to Neighbor
                 // is less than dist[Neighbor].
