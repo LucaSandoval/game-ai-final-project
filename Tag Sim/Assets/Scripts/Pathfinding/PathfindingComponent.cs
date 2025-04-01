@@ -49,9 +49,6 @@ public class PathfindingComponent : MonoBehaviour
             {
                 Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                 destination = mousePos;
-                //Debug.Log($"Destination set to {destination.x}, {destination.y}");
-
-                // Get the grid tile at the clicked position
              }
 
             // Player Movement
@@ -209,7 +206,7 @@ public class PathfindingComponent : MonoBehaviour
         PriorityQueue<GridTile> openSet = new PriorityQueue<GridTile>(compareFScore);
         openSet.Enqueue(startTile);
 
-        //Debug.Log($"Starting AStar from {startTile.GridCoordinate.x}, {startTile.GridCoordinate.y} to {finalTile.GridCoordinate.x}, {finalTile.GridCoordinate.y}");
+        
 
         while (openSet.Count > 0)
         {
@@ -219,7 +216,6 @@ public class PathfindingComponent : MonoBehaviour
             if (currentTile == finalTile)
             {
                 List<GridTile> stepsOut = new List<GridTile>();
-                //Debug.Log($"Path found! {currentTile.GridCoordinate.x}, {currentTile.GridCoordinate.y}");
 
                 // Add in destination tile
                 stepsOut.Add(currentTile);
@@ -294,7 +290,6 @@ public class PathfindingComponent : MonoBehaviour
         Dictionary<GridTile, GridTile> prev = new Dictionary<GridTile, GridTile>();
 
         // Debug log for starting tile
-        //Debug.Log($"Starting Dijkstra from {startingTile.GridCoordinate.x}, {startingTile.GridCoordinate.y}");
 
         // Define our minimum distance comparator for our heap
         Comparison<GridTile> CompareMinimumDistance = (GridTile a, GridTile b) =>
@@ -347,9 +342,6 @@ public class PathfindingComponent : MonoBehaviour
                 {
                     distanceMapOut.SetGridValue(neighbor.GridCoordinate.x, neighbor.GridCoordinate.y, Alt);
                     prev[neighbor] = currentTile;
-
-                    // Add debug log for the updated tile
-                    Debug.Log($"Updated tile at ({neighbor.GridCoordinate.x}, {neighbor.GridCoordinate.y}) with value {Alt}");
 
                     q.Enqueue(neighbor);
                 }

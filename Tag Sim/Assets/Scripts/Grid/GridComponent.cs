@@ -47,7 +47,6 @@ public class GridComponent : Singleton<GridComponent>
             Height = bounds.size.y;
 
             GridTile[,] newGridTiles = new GridTile[Width, Height];
-            Debug.Log($"GridComponent: Creating grid with dimensions ({Width}, {Height})");
 
             for (int y = bounds.yMax - 1; y > bounds.yMin - 1; y--)
             {
@@ -67,11 +66,9 @@ public class GridComponent : Singleton<GridComponent>
 
                         if (tile.name == "Water")
                         {
-                            Debug.Log($"Tile at ({x - bounds.xMin}, {y - bounds.yMin}) is Water. Setting value to 2.");
+                            // Debug.Log($"Tile at ({x - bounds.xMin}, {y - bounds.yMin}) is Water. Setting value to 2.");
                             newTile.Value = 2; 
                         }
-
-                        //Debug.Log($"Created tile at ({x - bounds.xMin}, {y - bounds.yMin}): WorldPosition={newTile.WorldPosition}, Traversable={newTile.Traversable}");
                     }
                     else
                     {
