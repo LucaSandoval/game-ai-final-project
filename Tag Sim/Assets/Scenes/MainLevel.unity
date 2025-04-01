@@ -1525,6 +1525,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerPos: {x: 0, y: 0}
+  currentStamina: 0
 --- !u!4 &877052538 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6503444505702742961, guid: 50cd81df3c42fc94e93c4a026e855f5a, type: 3}

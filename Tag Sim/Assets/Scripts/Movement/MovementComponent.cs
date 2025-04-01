@@ -64,4 +64,14 @@ public class MovementComponent : MonoBehaviour
             }
         }
     }
+
+    public float GetSpeed()
+    {
+        return MovementSpeed;
+    }
+
+    public void SetSpeed(float speed)
+    {
+        MovementSpeed = speed;
+    }
 }
