@@ -17,7 +17,7 @@ public class AIController : MonoBehaviour
     private float guessCooldown = 2f;
     private float lastGuessTime;
 
-    private void Awake()
+    private void Start()
     {
         grid = GridComponent.Instance;
         pathfinding = GetComponent<PathfindingComponent>();
