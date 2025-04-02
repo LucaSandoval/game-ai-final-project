@@ -36,9 +36,24 @@ public class OccupancyMap
     /// </summary>
     public void UpdateVisibility(List<GridTile> visibleTiles)
     {
+        // Clear all visibility first
+        var (width, height) = grid.GetGridSize();
+
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                GridTile tile = grid.GetTile(x, y);
+                if (tile != null)
+                    tile.Visible = false;
+            }
+        }
+
+        // Set visibility for current frame
         foreach (GridTile tile in visibleTiles)
         {
             tile.Visible = true;
         }
     }
+
 }

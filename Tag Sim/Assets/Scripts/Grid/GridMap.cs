@@ -117,4 +117,13 @@ public class GridMap
             tiles[x, y].Visible = visible;
         }
     }
+
+    /// <summary>
+    /// Returns the width and height of the grid.
+    /// </summary>
+    public (int, int) GetGridSize()
+    {
+        return (width, height);
+    }
+
 }

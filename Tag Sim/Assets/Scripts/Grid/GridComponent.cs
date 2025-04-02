@@ -174,24 +174,61 @@ public class GridComponent : Singleton<GridComponent>
         return Vector2.Distance(tile1.WorldPosition, tile2.WorldPosition);
     }
 
-    private void OnGUI()
+   private void OnGUI()
     {
-        if (DebugDisplayTileValues && debugGrid != null)
+        if (DebugDisplayTileValues && mainGrid != null)
         {
             GUIStyle style = new GUIStyle();
-            style.fontSize = 20;  // Increase font size
-            style.normal.textColor = Color.black; // Set text color to black
+            style.fontSize = 90;
+            style.normal.textColor = Color.black;
 
             for (int h = 0; h < Height; h++)
             {
                 for (int w = 0; w < Width; w++)
                 {
-                    if (debugGrid.GetTile(w, h).Value == float.MaxValue) continue;
-                    Vector2 screenPos = Camera.main.WorldToScreenPoint(mainGrid.GetTile(w, h).WorldPosition);
+                    GridTile tile = mainGrid.GetTile(w, h);
+                    Vector2 screenPos = Camera.main.WorldToScreenPoint(tile.WorldPosition);
                     float flippedY = Screen.height - screenPos.y;
-                    GUI.Label(new Rect(screenPos.x - 20, flippedY + 10, 500, 500), debugGrid.GetTile(w, h).Value.ToString("F1"), style);
+
+                    string label = "";
+
+                    if (tile.Occupied)
+                        label += "X"; // Occupied
+
+                    if (tile.Visible)
+                        label += "O"; // Visible
+
+                    GUI.Label(new Rect(screenPos.x - 20, flippedY + 20, 200, 200), label, style);
                 }
             }
         }
     }
+
+    private void OnDrawGizmos()
+    {
+        if (Application.isPlaying && mainGrid != null)
+        {
+            for (int h = 0; h < Height; h++)
+            {
+                for (int w = 0; w < Width; w++)
+                {
+                    GridTile tile = mainGrid.GetTile(w, h);
+                    Vector2 pos = tile.WorldPosition;
+
+                    if (tile.Occupied)
+                    {
+                        Gizmos.color = Color.red;
+                        Gizmos.DrawCube(pos, Vector3.one * 0.5f);
+                    }
+                    else if (tile.Visible)
+                    {
+                        Gizmos.color = Color.yellow;
+                        Gizmos.DrawWireCube(pos, Vector3.one * 0.5f);
+                    }
+                }
+            }
+        }
+    }
+
+
 }

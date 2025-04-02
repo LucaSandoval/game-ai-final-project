@@ -331,4 +331,11 @@ public class PathfindingComponent : MonoBehaviour
         }
         return (distanceMapOut, prev);
     }
+
+    //Using this for the AI controller to be able to set their target destination
+    public void SetDestination(Vector2 target)
+    {
+        destination = target;
+    }
+
 }

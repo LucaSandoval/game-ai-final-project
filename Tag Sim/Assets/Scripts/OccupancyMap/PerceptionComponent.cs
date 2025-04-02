@@ -29,7 +29,7 @@ public class PerceptionComponent : MonoBehaviour
     /// <summary>
     /// Updates perception and vision of the AI.
     /// </summary>
-    private void UpdatePerception()
+    public void UpdatePerception()
     {
         visibleTiles.Clear();
 
@@ -84,6 +84,14 @@ public class PerceptionComponent : MonoBehaviour
     public List<GridTile> GetVisibleTiles()
     {
         return visibleTiles;
+    }
+    
+    /// <summary>
+    /// returns the Players location if it is in the line of sight of the enemy AI 
+    /// </summary>
+    public Transform GetSeenPlayer()
+    {
+        return player;
     }
 
     /// <summary>
