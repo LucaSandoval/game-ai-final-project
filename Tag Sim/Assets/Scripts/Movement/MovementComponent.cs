@@ -11,6 +11,7 @@ public class MovementComponent : MonoBehaviour
     private List<Vector2> movementPath;
     private bool moving;
 
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();

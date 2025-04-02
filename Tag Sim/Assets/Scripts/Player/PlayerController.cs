@@ -1,7 +1,10 @@
 using UnityEngine;
+using System.Collections.Generic;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
+
     private GridComponent gridComponent;
     private MovementComponent movementComponent;
 
@@ -18,6 +21,9 @@ public class PlayerController : MonoBehaviour
     private float staminaRegen = 10f;
     private bool isSprinting;
 
+    public Image staminaBar;
+    public CanvasGroup staminaCanvasGroup;
+
 
     private Vector2 lastPosition; // Track the last position for movement check
 
@@ -31,6 +37,11 @@ public class PlayerController : MonoBehaviour
 
         currentStamina = maxStamina;
         lastPosition = transform.position;
+
+        if (staminaCanvasGroup == null)
+        {
+            Debug.LogWarning("CanvasGroup for stamina UI is null");
+        }
     }
 
     private void Update()
@@ -50,7 +61,7 @@ public class PlayerController : MonoBehaviour
             if (currentStamina <= 0)
             {
                 currentStamina = 0;
-                isSprinting = false; 
+                isSprinting = false;
                 movementComponent.SetSpeed(originalSpeed);
             }
         }
@@ -61,7 +72,16 @@ public class PlayerController : MonoBehaviour
         }
 
         lastPosition = transform.position;
+        staminaBar.fillAmount = currentStamina / maxStamina;
+
+        // Stamina bar fades out when stamina is full
+        if (staminaCanvasGroup != null)
+        {
+            float targetAlpha = (currentStamina < maxStamina) ? 1f : 0f;
+            staminaCanvasGroup.alpha = Mathf.Lerp(staminaCanvasGroup.alpha, targetAlpha, Time.deltaTime * 5f);
+        }
     }
+
 
     // Get the destination of the player based on the key pressed
     public Vector2 getDestination()
@@ -80,7 +100,8 @@ public class PlayerController : MonoBehaviour
         if (isSprinting && currentStamina > 0)
         {
             movementComponent.SetSpeed(sprintSpeed);
-        } else
+        }
+        else
         {
             movementComponent.SetSpeed(originalSpeed);
         }
@@ -97,6 +118,14 @@ public class PlayerController : MonoBehaviour
 
         // Get the target tile and return its world position
         GridTile targetTile = gridComponent.GetTile(targetCoord.x, targetCoord.y);
-        return targetTile.WorldPosition;
+        if (targetTile.Traversable && targetTile != null)
+        {
+            return targetTile.WorldPosition;
+        }
+        else
+        {
+            return transform.position;
+        }
+            
     }
 }
