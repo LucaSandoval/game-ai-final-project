@@ -1,11 +1,12 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 
 public class PerceptionComponent : MonoBehaviour
 {
     [Header("Perception Settings")]
     [SerializeField] private float maxVisionRadius = 5f;
-    [SerializeField] private float visionAngle = 90f;
+    [SerializeField] private float visionAngle = 60f;
     [SerializeField] private LayerMask playerMask;
     [SerializeField] private LayerMask obstacleMask;
 
@@ -14,11 +15,13 @@ public class PerceptionComponent : MonoBehaviour
 
     private GridComponent grid;
     private Transform player;
+    private MovementComponent movementComponent;
     private List<GridTile> visibleTiles = new List<GridTile>();
 
     private void Awake()
     {
         grid = GridComponent.Instance;
+        movementComponent = GetComponent<MovementComponent>();
     }
 
     private void Update()
@@ -33,30 +36,57 @@ public class PerceptionComponent : MonoBehaviour
     {
         visibleTiles.Clear();
 
-        // Get the player's position
-        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, maxVisionRadius, playerMask);
+        if (grid == null) grid = GridComponent.Instance;
+        if (grid == null)
+        {
+            Debug.LogError("PerceptionComponent: GridComponent is null.");
+            return;
+        }
+
+        PathfindingComponent pathfinding = GetComponent<PathfindingComponent>();
+        if (pathfinding == null)
+        {
+            Debug.LogError("PerceptionComponent: PathfindingComponent missing.");
+            return;
+        }
+
+        // Get player
+        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, maxVisionRadius);
         foreach (Collider2D hit in hits)
         {
+            Debug.Log($"Checking collider: {hit.name}");
             if (hit.CompareTag("Player"))
             {
+                Debug.Log("Player detected (fallback no-layer check)");
                 player = hit.transform;
                 break;
             }
         }
 
-        // Get Dijkstra map to determine visible tiles
-        (GridMap visibilityMap, _) = grid.test.Dijkstra(transform.position);
-        for (int h = 0; h < grid.GetGridDimensions().Item2; h++)
+        // Get visibility map
+        (GridMap visibilityMap, _) = pathfinding.Dijkstra(transform.position);
+        if (visibilityMap == null) return;
+
+        var (width, height) = grid.GetGridData().GetGridSize();
+
+        for (int h = 0; h < height; h++)
         {
-            for (int w = 0; w < grid.GetGridDimensions().Item1; w++)
+            for (int w = 0; w < width; w++)
             {
                 GridTile tile = grid.GetGridData().GetTile(w, h);
-                float distance = visibilityMap.GetGridValue(w, h);
-                float visionStrength = visionFalloff.Evaluate(distance / maxVisionRadius);
+                if (tile == null) continue;
 
-                if (distance <= maxVisionRadius && IsTileWithinFOV(tile))
+                float distance = visibilityMap.GetGridValue(w, h);
+                float visionStrength = visionFalloff != null ? visionFalloff.Evaluate(distance / maxVisionRadius) : 1f;
+
+                if (
+                    distance <= maxVisionRadius &&
+                    IsTileWithinFOV(tile) &&
+                    HasLineOfSight(tile)
+                )
                 {
                     tile.Visible = true;
+                    tile.LastSeenTime = Time.time;
                     visibleTiles.Add(tile);
                 }
                 else
@@ -67,16 +97,23 @@ public class PerceptionComponent : MonoBehaviour
         }
     }
 
+
+
     /// <summary>
     /// Checks if a tile is within the AI's field of view.
     /// </summary>
     private bool IsTileWithinFOV(GridTile tile)
     {
         Vector2 directionToTile = (tile.WorldPosition - (Vector2)transform.position).normalized;
-        float angleToTile = Vector2.Angle(transform.right, directionToTile);
 
-        return angleToTile <= visionAngle / 2;
+        Vector2 facing = movementComponent != null ? movementComponent.GetCurrentVelocity().normalized : Vector2.right;
+
+        if (facing == Vector2.zero) facing = Vector2.right; // Default fallback direction
+
+        float angleToTile = Vector2.Angle(facing, directionToTile);
+        return angleToTile <= visionAngle / 2f;
     }
+
 
     /// <summary>
     /// Gets all visible tiles.
@@ -94,6 +131,29 @@ public class PerceptionComponent : MonoBehaviour
         return player;
     }
 
+    private bool HasLineOfSight(GridTile tile)
+    {
+        Vector2 start = transform.position;
+        Vector2 end = tile.WorldPosition;
+        Vector2 dir = (end - start).normalized;
+        float distance = Vector2.Distance(start, end);
+
+        RaycastHit2D[] hits = Physics2D.RaycastAll(start, dir, distance, obstacleMask);
+
+        foreach (RaycastHit2D hit in hits)
+        {
+            // If it hit something that ISN'T the player, return false
+            if (!hit.collider.CompareTag("Player"))
+            {
+                Debug.Log($"Blocked by: {hit.collider.name}");
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+
     /// <summary>
     /// Draws the AI's vision radius and field of view in the editor.
     /// </summary>
@@ -108,6 +168,17 @@ public class PerceptionComponent : MonoBehaviour
 
         Gizmos.DrawLine(transform.position, transform.position + leftSide);
         Gizmos.DrawLine(transform.position, transform.position + rightSide);
+
+        Gizmos.color = Color.cyan;
+
+        if (movementComponent != null)
+        {
+            Vector2 facing = movementComponent.GetCurrentVelocity().normalized;
+            if (facing != Vector2.zero)
+            {
+                Gizmos.DrawLine(transform.position, transform.position + (Vector3)facing * maxVisionRadius);
+            }
+        }
     }
 }
 

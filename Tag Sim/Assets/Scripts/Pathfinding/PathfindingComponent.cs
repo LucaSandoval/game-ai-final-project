@@ -39,6 +39,7 @@ public class PathfindingComponent : MonoBehaviour
                 // Get the grid tile at the clicked position
                 }
         }
+
     }
 
     /// <summary>

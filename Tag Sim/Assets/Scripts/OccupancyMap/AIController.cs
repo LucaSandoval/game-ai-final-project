@@ -4,7 +4,7 @@ using System.Collections.Generic;
 [RequireComponent(typeof(PathfindingComponent), typeof(PerceptionComponent))]
 public class AIController : MonoBehaviour
 {
-    [Header("AI Behavior Settings")]
+    [Header("AI Settings")]
     [SerializeField] private bool chasePlayerWhenSeen = true;
 
     private PathfindingComponent pathfinding;
@@ -13,6 +13,9 @@ public class AIController : MonoBehaviour
     private GridTile currentTile;
     private GridTile previousTile;
     private GridComponent grid;
+    private GridTile currentTargetGuess;
+    private float guessCooldown = 2f;
+    private float lastGuessTime;
 
     private void Awake()
     {
@@ -26,6 +29,11 @@ public class AIController : MonoBehaviour
     {
         UpdateTileOccupation();
         UpdatePerceptionAndOccupancy();
+        if (Time.time - lastGuessTime > guessCooldown)
+        {
+            GuessPlayerLocation();
+            lastGuessTime = Time.time;
+        }
         //UpdateBehavior();
     }
 
@@ -53,6 +61,53 @@ public class AIController : MonoBehaviour
     {
         List<GridTile> visibleTiles = perception.GetVisibleTiles();
         occupancyMap.UpdateVisibility(visibleTiles);
+    }
+
+
+    private void GuessPlayerLocation()
+    {
+        Debug.Log("Guessing where the Player is");
+        GridMap grid = GridComponent.Instance.GetGridData();
+        var (width, height) = grid.GetGridSize();
+
+        GridTile bestGuess = null;
+        float longestUnseen = -1f;
+
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                GridTile tile = grid.GetTile(x, y);
+                if (tile == null || !tile.Traversable || tile.Occupied || tile.Visible)
+                    continue;
+
+                float unseenTime = Time.time - tile.LastSeenTime;
+                if (unseenTime > longestUnseen)
+                {
+                    longestUnseen = unseenTime;
+                    bestGuess = tile;
+                }
+            }
+        }
+
+        if (currentTargetGuess != null)
+            currentTargetGuess.IsTargetGuess = false;
+
+        currentTargetGuess = bestGuess;
+
+        if (currentTargetGuess != null)
+        {
+            if (bestGuess == null)
+            {
+                Debug.Log("Oops No GUESS.");
+                return;
+            }
+
+            currentTargetGuess.IsTargetGuess = true;
+
+            // Optional: Move toward it
+            GetComponent<PathfindingComponent>().SetDestination(currentTargetGuess.WorldPosition);
+        }
     }
 
     ///// <summary>

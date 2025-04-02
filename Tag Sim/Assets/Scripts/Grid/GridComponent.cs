@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Tilemaps;
 
 /// <summary>
@@ -174,13 +174,45 @@ public class GridComponent : Singleton<GridComponent>
         return Vector2.Distance(tile1.WorldPosition, tile2.WorldPosition);
     }
 
-   private void OnGUI()
+    private void OnGUI()
     {
         if (DebugDisplayTileValues && mainGrid != null)
         {
+            Texture2D heatTexture = new Texture2D(1, 1);
+            float suspicionFadeSeconds = 10f;
+
+            for (int h = 0; h < Height; h++)
+            {
+                for (int w = 0; w < Width; w++)
+                {
+                    GridTile tile = mainGrid.GetTile(w, h);
+                    Vector2 screenPos = Camera.main.WorldToScreenPoint(tile.WorldPosition);
+                    float flippedY = Screen.height - screenPos.y;
+
+                    float timeUnseen = Time.time - tile.LastSeenTime;
+                    float intensity = Mathf.Clamp01(timeUnseen / suspicionFadeSeconds);
+                    float minAlpha = 0f; // Always at least 30% opaque
+                    float maxAlpha = 0.05f; // At most 80% opaque
+
+                    Color baseColor = Color.Lerp(Color.yellow, Color.red, intensity);
+                    float alpha = Mathf.Lerp(minAlpha, maxAlpha, intensity);
+                    Color heatColor = new Color(baseColor.r, baseColor.g, baseColor.b, alpha);
+                    heatTexture.SetPixel(0, 0, heatColor);
+                    heatTexture.Apply();
+
+                    GUI.DrawTexture(
+                        new Rect(screenPos.x - 20, flippedY - 20, 40, 40),
+                        heatTexture
+                    );
+                }
+            }
+
             GUIStyle style = new GUIStyle();
-            style.fontSize = 90;
+            style.fontSize = 30;
             style.normal.textColor = Color.black;
+            style.alignment = TextAnchor.MiddleCenter;
+
+            float labelSize = 40f;
 
             for (int h = 0; h < Height; h++)
             {
@@ -192,17 +224,24 @@ public class GridComponent : Singleton<GridComponent>
 
                     string label = "";
 
-                    if (tile.Occupied)
-                        label += "X"; // Occupied
+                    if (tile.IsTargetGuess) label = "T";
+                    else
+                    {
+                        if (tile.Occupied) label += "X";
+                        if (tile.Visible) label += "O";
+                    }
 
-                    if (tile.Visible)
-                        label += "O"; // Visible
-
-                    GUI.Label(new Rect(screenPos.x - 20, flippedY + 20, 200, 200), label, style);
+                    if (!string.IsNullOrEmpty(label))
+                    {
+                        Rect labelRect = new Rect(screenPos.x - labelSize / 2f, flippedY - labelSize / 2f, labelSize, labelSize);
+                        GUI.Label(labelRect, label, style);
+                    }
                 }
             }
         }
     }
+
+
 
     private void OnDrawGizmos()
     {
@@ -215,16 +254,26 @@ public class GridComponent : Singleton<GridComponent>
                     GridTile tile = mainGrid.GetTile(w, h);
                     Vector2 pos = tile.WorldPosition;
 
-                    if (tile.Occupied)
+                    float timeUnseen = Time.time - tile.LastSeenTime;
+
+                    if (tile.IsTargetGuess)
+                    {
+                        Gizmos.color = Color.magenta;
+                        Gizmos.DrawCube(pos, Vector3.one * 0.6f);
+                    }
+                    else if (tile.Occupied)
                     {
                         Gizmos.color = Color.red;
                         Gizmos.DrawCube(pos, Vector3.one * 0.5f);
                     }
-                    else if (tile.Visible)
+                    else
                     {
-                        Gizmos.color = Color.yellow;
-                        Gizmos.DrawWireCube(pos, Vector3.one * 0.5f);
+                        // Draw a suspicion heatmap — more "red" the longer it's been unseen
+                        float intensity = Mathf.Clamp01(timeUnseen / 10f); // 0 (just seen) → 1 (unseen for 10+ seconds)
+                        Gizmos.color = Color.Lerp(Color.green, Color.red, intensity);
+                        Gizmos.DrawCube(pos, Vector3.one * 0.4f);
                     }
+
                 }
             }
         }

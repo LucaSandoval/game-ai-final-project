@@ -53,6 +53,12 @@ public class MovementComponent : MonoBehaviour
         }
     }
 
+    public Vector2 GetCurrentVelocity()
+    {
+        return rb != null ? rb.linearVelocity : Vector2.zero;
+    }
+
+
     private void Update()
     {
         if (DebugVisualization && movementPath.Count > 0)
