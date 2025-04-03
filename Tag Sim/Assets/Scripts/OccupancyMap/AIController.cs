@@ -20,9 +20,28 @@ public class AIController : MonoBehaviour
     private void Start()
     {
         grid = GridComponent.Instance;
+        if (grid == null)
+        {
+            Debug.LogError("AIController: GridComponent.Instance is null.");
+            return;
+        }
+
+        GridMap gridData = grid.GetGridData();
+        if (gridData == null)
+        {
+            Debug.LogError("AIController: grid.GetGridData() returned null.");
+            return;
+        }
+
         pathfinding = GetComponent<PathfindingComponent>();
         perception = GetComponent<PerceptionComponent>();
-        occupancyMap = new OccupancyMap(grid.GetGridData());
+        if (perception == null)
+        {
+            Debug.LogError("AIController: PerceptionComponent not found on " + gameObject.name);
+            return;
+        }
+
+        occupancyMap = new OccupancyMap(gridData);
     }
 
     private void Update()
