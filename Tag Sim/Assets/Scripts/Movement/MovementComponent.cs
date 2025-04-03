@@ -11,6 +11,7 @@ public class MovementComponent : MonoBehaviour
     private List<Vector2> movementPath;
     private bool moving;
 
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -69,5 +70,15 @@ public class MovementComponent : MonoBehaviour
                 Debug.DrawLine(movementPath[i], movementPath[i + 1], Color.green);
             }
         }
+    }
+
+    public float GetSpeed()
+    {
+        return MovementSpeed;
+    }
+
+    public void SetSpeed(float speed)
+    {
+        MovementSpeed = speed;
     }
 }

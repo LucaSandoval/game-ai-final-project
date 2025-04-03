@@ -11,15 +11,30 @@ public class PathfindingComponent : MonoBehaviour
     private MovementComponent movementComponent;
     private Vector2 destination;
 
+    [SerializeField] private bool isPlayer = false;
+    private PlayerController playerController;
+
     private void Awake()
     {
         movementComponent = GetComponent<MovementComponent>();
+
+        if (isPlayer)
+        {
+            playerController = GetComponent<PlayerController>();
+        }
     }
 
     private void Start()
     {
-        destination = GridComponent.Instance.GetTile(0, 0).WorldPosition;
-        // Debug.Log($"Destination set to {destination.x}, {destination.y}");
+        if (isPlayer == false)
+        {
+            destination = GridComponent.Instance.GetTile(0, 0).WorldPosition;
+        }
+        //else
+        //{
+        //    destination = GridComponent.Instance.GetTile(1, 0).WorldPosition;
+        //}
+
     }
 
     private void Update()
@@ -34,10 +49,18 @@ public class PathfindingComponent : MonoBehaviour
             {
                 Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                 destination = mousePos;
-                //Debug.Log($"Destination set to {destination.x}, {destination.y}");
+             }
 
-                // Get the grid tile at the clicked position
+            // Player Movement
+            if (isPlayer)
+            {
+                Vector2 targetPos = playerController.getDestination();
+
+                if (targetPos != destination)
+                {
+                    destination = targetPos;
                 }
+            }
         }
 
     }
@@ -91,7 +114,7 @@ public class PathfindingComponent : MonoBehaviour
                 if (currentCell == null) return false;
                     
                 // Traversability check
-                if (!currentCell.Traversable) return false;
+                if (!currentCell.Traversable || !currentCell.EnemyTraversable) return false;
 
                 // Success condition
                 if (currentCell == end) return true;
@@ -184,7 +207,7 @@ public class PathfindingComponent : MonoBehaviour
         PriorityQueue<GridTile> openSet = new PriorityQueue<GridTile>(compareFScore);
         openSet.Enqueue(startTile);
 
-        //Debug.Log($"Starting AStar from {startTile.GridCoordinate.x}, {startTile.GridCoordinate.y} to {finalTile.GridCoordinate.x}, {finalTile.GridCoordinate.y}");
+        
 
         while (openSet.Count > 0)
         {
@@ -194,7 +217,6 @@ public class PathfindingComponent : MonoBehaviour
             if (currentTile == finalTile)
             {
                 List<GridTile> stepsOut = new List<GridTile>();
-                //Debug.Log($"Path found! {currentTile.GridCoordinate.x}, {currentTile.GridCoordinate.y}");
 
                 // Add in destination tile
                 stepsOut.Add(currentTile);
@@ -227,7 +249,12 @@ public class PathfindingComponent : MonoBehaviour
                 // Check if neighbor is within grid bounds
                 if (neigbor == null) continue;
                 // Check if this neighbor is inaccessible
-                if (!neigbor.Traversable) continue;
+                if (!neigbor.Traversable || (!neigbor.EnemyTraversable && !isPlayer)) continue;
+
+                if (!neigbor.PlayerTraversable && isPlayer)
+                {
+                    continue;
+                }
 
                 float tentativeGScore = gScore[currentTile] + grid.DistanceBetweenTiles(currentTile, neigbor);
                 // Check if this path to the neighbor is better than any previous one
@@ -269,7 +296,6 @@ public class PathfindingComponent : MonoBehaviour
         Dictionary<GridTile, GridTile> prev = new Dictionary<GridTile, GridTile>();
 
         // Debug log for starting tile
-        //Debug.Log($"Starting Dijkstra from {startingTile.GridCoordinate.x}, {startingTile.GridCoordinate.y}");
 
         // Define our minimum distance comparator for our heap
         Comparison<GridTile> CompareMinimumDistance = (GridTile a, GridTile b) =>
@@ -310,7 +336,7 @@ public class PathfindingComponent : MonoBehaviour
                 // Check if neighbor is within grid bounds
                 if (neighbor == null) continue;
                 // Check if this neighbor is inaccessible
-                if (!neighbor.Traversable) continue;
+                if (!neighbor.Traversable || (!neighbor.EnemyTraversable && !isPlayer)) continue;
 
                 // Check if the dist[CurrentCell] + distance from CurrentCell to Neighbor
                 // is less than dist[Neighbor].
@@ -322,9 +348,6 @@ public class PathfindingComponent : MonoBehaviour
                 {
                     distanceMapOut.SetGridValue(neighbor.GridCoordinate.x, neighbor.GridCoordinate.y, Alt);
                     prev[neighbor] = currentTile;
-
-                    // Add debug log for the updated tile
-                    Debug.Log($"Updated tile at ({neighbor.GridCoordinate.x}, {neighbor.GridCoordinate.y}) with value {Alt}");
 
                     q.Enqueue(neighbor);
                 }

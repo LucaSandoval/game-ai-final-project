@@ -13,8 +13,9 @@ public class GridComponent : Singleton<GridComponent>
     [SerializeField] private GameObject GridParent;
 
     [SerializeField] private bool DebugDisplayTileValues;
-    [SerializeField] private Tilemap tilemap;
+    [SerializeField] private MapController MapController;
 
+    private Tilemap tilemap;
     private GridMap mainGrid;
     private Vector2 gridTopLeft, gridBottomRight;
     private int Width, Height;
@@ -40,6 +41,7 @@ public class GridComponent : Singleton<GridComponent>
     {
         base.Awake();
 
+        tilemap = MapController.GetCurrentMap();
         if (tilemap != null)
         {
             BoundsInt bounds = tilemap.cellBounds;
@@ -47,7 +49,6 @@ public class GridComponent : Singleton<GridComponent>
             Height = bounds.size.y;
 
             GridTile[,] newGridTiles = new GridTile[Width, Height];
-            Debug.Log($"GridComponent: Creating grid with dimensions ({Width}, {Height})");
 
             for (int y = bounds.yMax - 1; y > bounds.yMin - 1; y--)
             {
@@ -62,10 +63,10 @@ public class GridComponent : Singleton<GridComponent>
                         newTile.WorldPosition = tilemap.CellToWorld(tilePosition) + new Vector3(TileWorldSize / 2, TileWorldSize / 2, 0);
                         newTile.GridCoordinate = new Vector2Int(x - bounds.xMin, y - bounds.yMin);
                         newTile.Traversable = !tilemap.GetTile(tilePosition).name.Contains("Wall");
+                        newTile.PlayerTraversable = !tilemap.GetTile(tilePosition).name.Contains("Player");
+                        newTile.EnemyTraversable = !tilemap.GetTile(tilePosition).name.Contains("Enemy");
 
                         newGridTiles[x - bounds.xMin, y - bounds.yMin] = newTile;
-
-                        //Debug.Log($"Created tile at ({x - bounds.xMin}, {y - bounds.yMin}): WorldPosition={newTile.WorldPosition}, Traversable={newTile.Traversable}");
                     }
                     else
                     {

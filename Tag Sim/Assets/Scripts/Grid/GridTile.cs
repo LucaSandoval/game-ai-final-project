@@ -7,11 +7,8 @@ public class GridTile
 {
     public float Value;
     public bool Traversable;
-    public bool Occupied;
-    public bool Visible;
+    public bool PlayerTraversable;
+    public bool EnemyTraversable;
     public Vector2 WorldPosition;
     public Vector2Int GridCoordinate;
-    public float LastSeenTime = -Mathf.Infinity; // Make it so AI start with having no idea where the player could be hiding
-    public bool IsTargetGuess = false; 
-
 }
