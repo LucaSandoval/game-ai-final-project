@@ -14,7 +14,7 @@ public class AIController : MonoBehaviour
     private GridTile previousTile;
     private GridComponent grid;
     private GridTile currentTargetGuess;
-    private float guessCooldown = 2f;
+    private float guessCooldown = 0.75f;
     private float lastGuessTime;
 
     private void Start()
@@ -34,7 +34,7 @@ public class AIController : MonoBehaviour
             GuessPlayerLocation();
             lastGuessTime = Time.time;
         }
-        //UpdateBehavior();
+        UpdateBehavior();
     }
 
     /// <summary>
@@ -110,17 +110,17 @@ public class AIController : MonoBehaviour
         }
     }
 
-    ///// <summary>
-    ///// Optional: if the player is detected, update the pathfinding destination.
-    ///// </summary>
-    //private void UpdateBehavior()
-    //{
-    //    if (!chasePlayerWhenSeen) return;
+    /// <summary>
+    /// if the player is detected, update the pathfinding destination.
+    /// </summary>
+    private void UpdateBehavior()
+    {
+        if (!chasePlayerWhenSeen) return;
 
-    //    Transform player = perception.GetSeenPlayer();
-    //    if (player != null)
-    //    {
-    //        pathfinding.SetDestination(player.position);
-    //    }
-    //}
+        Transform player = perception.GetSeenPlayer();
+        if (player != null)
+        {
+            pathfinding.SetDestination(player.position);
+        }
+    }
 }
