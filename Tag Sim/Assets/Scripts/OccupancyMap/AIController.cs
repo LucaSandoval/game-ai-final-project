@@ -6,6 +6,9 @@ public class AIController : MonoBehaviour
 {
     [Header("AI Settings")]
     [SerializeField] private bool chasePlayerWhenSeen = true;
+    [SerializeField] private float guessCooldown = 0.75f;
+    [SerializeField] private float forgetPlayerDelay = 2f;
+    [SerializeField] private float patrolUpdateFrequency = 1.5f;
 
     private PathfindingComponent pathfinding;
     private PerceptionComponent perception;
@@ -14,8 +17,12 @@ public class AIController : MonoBehaviour
     private GridTile previousTile;
     private GridComponent grid;
     private GridTile currentTargetGuess;
-    private float guessCooldown = 0.75f;
+
     private float lastGuessTime;
+    private float lastSeenPlayerTime = -Mathf.Infinity;
+    private float lastPatrolUpdateTime = 0f;
+    private bool isChasingPlayer = false;
+    private bool isPatrolling = false;
 
     private void Start()
     {
@@ -41,24 +48,41 @@ public class AIController : MonoBehaviour
             return;
         }
 
+        // Initialize occupancy map
         occupancyMap = new OccupancyMap(gridData);
+
+        // Initialize patrol behavior
+        lastGuessTime = Time.time;
+        lastPatrolUpdateTime = Time.time;
+        TryResumePatrol();
     }
 
     private void Update()
     {
         UpdateTileOccupation();
         UpdatePerceptionAndOccupancy();
-        if (Time.time - lastGuessTime > guessCooldown)
-        {
-            GuessPlayerLocation();
-            lastGuessTime = Time.time;
-        }
         UpdateBehavior();
+
+        // Regularly update patrol behavior when not chasing
+        if (!isChasingPlayer)
+        {
+            // Periodically check for a new patrol target
+            if (Time.time - lastPatrolUpdateTime > patrolUpdateFrequency)
+            {
+                TryResumePatrol();
+                lastPatrolUpdateTime = Time.time;
+            }
+
+            // If we've reached our target or don't have one, get a new one
+            if (currentTargetGuess != null &&
+                Vector2.Distance(transform.position, currentTargetGuess.WorldPosition) < 0.5f)
+            {
+                Debug.Log("Reached patrol target. Finding a new one.");
+                TryResumePatrol();
+            }
+        }
     }
 
-    /// <summary>
-    /// Updates which tile the AI is currently occupying.
-    /// </summary>
     private void UpdateTileOccupation()
     {
         currentTile = grid.GetGridTileAtWorldPosition(transform.position);
@@ -73,65 +97,41 @@ public class AIController : MonoBehaviour
         previousTile = currentTile;
     }
 
-    /// <summary>
-    /// Updates what the AI can see and feeds that data into the occupancy map.
-    /// </summary>
     private void UpdatePerceptionAndOccupancy()
     {
-        List<GridTile> visibleTiles = perception.GetVisibleTiles();
-        occupancyMap.UpdateVisibility(visibleTiles);
-    }
-
-
-    private void GuessPlayerLocation()
-    {
-        Debug.Log("Guessing where the Player is");
-        GridMap grid = GridComponent.Instance.GetGridData();
-        var (width, height) = grid.GetGridSize();
-
-        GridTile bestGuess = null;
-        float longestUnseen = -1f;
-
-        for (int y = 0; y < height; y++)
+        if (perception.GetSeenPlayer() != null)
         {
-            for (int x = 0; x < width; x++)
-            {
-                GridTile tile = grid.GetTile(x, y);
-                if (tile == null || !tile.Traversable || tile.Occupied || tile.Visible)
-                    continue;
+            lastSeenPlayerTime = Time.time;
 
-                float unseenTime = Time.time - tile.LastSeenTime;
-                if (unseenTime > longestUnseen)
-                {
-                    longestUnseen = unseenTime;
-                    bestGuess = tile;
-                }
+            // Only announce when transitioning from not chasing to chasing
+            if (!isChasingPlayer)
+            {
+                Debug.Log("Player spotted! Beginning chase.");
+            }
+
+            isChasingPlayer = true;
+            isPatrolling = false;
+
+            // Set player's position as the only occupancy value
+            GridTile playerTile = grid.GetGridTileAtWorldPosition(perception.GetSeenPlayer().position);
+            if (playerTile != null)
+            {
+                occupancyMap.ClearAndSetSingle(playerTile);
             }
         }
-
-        if (currentTargetGuess != null)
-            currentTargetGuess.IsTargetGuess = false;
-
-        currentTargetGuess = bestGuess;
-
-        if (currentTargetGuess != null)
+        else
         {
-            if (bestGuess == null)
+            // Player not seen, update occupancy map
+            occupancyMap.ClearVisible(perception.GetVisibleTiles());
+
+            // Only diffuse if we're not directly chasing the player
+            if (!isChasingPlayer)
             {
-                Debug.Log("Oops No GUESS.");
-                return;
+                occupancyMap.Diffuse(0.95f); // Fade trail over time
             }
-
-            currentTargetGuess.IsTargetGuess = true;
-
-            // Optional: Move toward it
-            GetComponent<PathfindingComponent>().SetDestination(currentTargetGuess.WorldPosition);
         }
     }
 
-    /// <summary>
-    /// if the player is detected, update the pathfinding destination.
-    /// </summary>
     private void UpdateBehavior()
     {
         if (!chasePlayerWhenSeen) return;
@@ -139,7 +139,66 @@ public class AIController : MonoBehaviour
         Transform player = perception.GetSeenPlayer();
         if (player != null)
         {
+            // Direct chase when player is visible
             pathfinding.SetDestination(player.position);
+            lastSeenPlayerTime = Time.time;
+            isChasingPlayer = true;
+            isPatrolling = false;
+
+            // Mark current target as no longer a target
+            if (currentTargetGuess != null)
+            {
+                currentTargetGuess.IsTargetGuess = false;
+                currentTargetGuess = null;
+            }
         }
+        else if (isChasingPlayer)
+        {
+            // Still chasing but lost sight
+            if (Time.time - lastSeenPlayerTime > forgetPlayerDelay)
+            {
+                Debug.Log("Lost sight of player for " + forgetPlayerDelay + " seconds. Returning to patrol.");
+                isChasingPlayer = false;
+                isPatrolling = false;
+                TryResumePatrol();
+            }
+            else
+            {
+                // Continue moving toward last known position (handled by pathfinding)
+                // The occupancy map will handle the diffusion of the last known position
+            }
+        }
+        else if (!isPatrolling ||
+                (currentTargetGuess != null && Vector2.Distance(transform.position, currentTargetGuess.WorldPosition) < 0.5f))
+        {
+            // If we're not patrolling or have reached our target, find a new patrol target
+            TryResumePatrol();
+        }
+    }
+
+    private void TryResumePatrol()
+    {
+        GridTile bestGuess = occupancyMap.GetMostLikelyTile();
+        if (bestGuess == null)
+        {
+            Debug.Log("TryResumePatrol: No guess available, will try again soon.");
+            return;
+        }
+
+        // Clear previous target marker
+        if (currentTargetGuess != null)
+        {
+            currentTargetGuess.IsTargetGuess = false;
+        }
+
+        // Set new target
+        currentTargetGuess = bestGuess;
+        currentTargetGuess.IsTargetGuess = true;
+        isPatrolling = true;
+
+        Debug.DrawLine(transform.position, currentTargetGuess.WorldPosition, Color.cyan, 2f);
+        Debug.Log($"Patrolling to {currentTargetGuess.GridCoordinate} with value {grid.GetGridData().GetGridValue(currentTargetGuess.GridCoordinate.x, currentTargetGuess.GridCoordinate.y)}");
+
+        pathfinding.SetDestination(currentTargetGuess.WorldPosition);
     }
 }

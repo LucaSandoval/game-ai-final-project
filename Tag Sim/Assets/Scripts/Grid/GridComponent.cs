@@ -25,7 +25,14 @@ public class GridComponent : Singleton<GridComponent>
 
     private void Start()
     {
-        debugGrid = test.Dijkstra(test.gameObject.transform.position).Item1;
+        if (test != null)
+        {
+            debugGrid = test.Dijkstra(test.gameObject.transform.position).Item1;
+        }
+        else
+        {
+            Debug.LogWarning("GridComponent: 'test' PathfindingComponent is not assigned.");
+        }
     }
 
     private void Update()
@@ -82,6 +89,25 @@ public class GridComponent : Singleton<GridComponent>
                 newGridTiles[Width - 1, 0].WorldPosition.y - halfTileWidth);
 
             mainGrid = new GridMap(Width, Height, newGridTiles);
+
+            // Calculate gridTopLeft and gridBottomRight safely
+            //I was getting null reference exceptions here, so I added this check
+            GridTile topLeftTile = newGridTiles[0, Height - 1];
+            GridTile bottomRightTile = newGridTiles[Width - 1, 0];
+
+            if (topLeftTile != null && bottomRightTile != null)
+            {
+                gridTopLeft = new Vector2(topLeftTile.WorldPosition.x - halfTileWidth,
+                                          topLeftTile.WorldPosition.y + halfTileWidth);
+                gridBottomRight = new Vector2(bottomRightTile.WorldPosition.x + halfTileWidth,
+                                              bottomRightTile.WorldPosition.y - halfTileWidth);
+            }
+            else
+            {
+                Debug.LogWarning(" GridComponent: Could not calculate grid bounds. Top-left or bottom-right tile is null.");
+                gridTopLeft = Vector2.zero;
+                gridBottomRight = Vector2.zero;
+            }
         }
         else if (UseInspectorChildGrid && GridParent)
         {

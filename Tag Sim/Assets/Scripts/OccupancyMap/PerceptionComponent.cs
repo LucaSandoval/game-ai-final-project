@@ -35,6 +35,7 @@ public class PerceptionComponent : MonoBehaviour
     public void UpdatePerception()
     {
         visibleTiles.Clear();
+        player = null; //So that the Ai doesn't keep the last seen player in memory
 
         if (grid == null) grid = GridComponent.Instance;
         if (grid == null)
