@@ -66,14 +66,13 @@ public class AIController : MonoBehaviour
         // Regularly update patrol behavior when not chasing
         if (!isChasingPlayer)
         {
-            // Periodically check for a new patrol target
             if (Time.time - lastPatrolUpdateTime > patrolUpdateFrequency)
             {
                 TryResumePatrol();
                 lastPatrolUpdateTime = Time.time;
             }
 
-            // If we've reached our target or don't have one, get a new one
+            // If reached our target or don't have one, get a new one
             if (currentTargetGuess != null &&
                 Vector2.Distance(transform.position, currentTargetGuess.WorldPosition) < 0.5f)
             {
@@ -103,7 +102,7 @@ public class AIController : MonoBehaviour
         {
             lastSeenPlayerTime = Time.time;
 
-            // Only announce when transitioning from not chasing to chasing
+            //Do you ever chase the player
             if (!isChasingPlayer)
             {
                 Debug.Log("Player spotted! Beginning chase.");
@@ -127,7 +126,7 @@ public class AIController : MonoBehaviour
             // Only diffuse if we're not directly chasing the player
             if (!isChasingPlayer)
             {
-                occupancyMap.Diffuse(0.95f); // Fade trail over time
+                occupancyMap.Diffuse(0.95f);
             }
         }
     }
@@ -171,7 +170,6 @@ public class AIController : MonoBehaviour
         else if (!isPatrolling ||
                 (currentTargetGuess != null && Vector2.Distance(transform.position, currentTargetGuess.WorldPosition) < 0.5f))
         {
-            // If we're not patrolling or have reached our target, find a new patrol target
             TryResumePatrol();
         }
     }

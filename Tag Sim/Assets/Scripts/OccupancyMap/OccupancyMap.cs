@@ -93,7 +93,7 @@ public class OccupancyMap
         float[,] tempValues = new float[grid.GetGridSize().Item1, grid.GetGridSize().Item2];
         var (width, height) = grid.GetGridSize();
 
-        // First, copy all current values to our temp array
+        // Copy all current values to our temp array
         for (int y = 0; y < height; y++)
         {
             for (int x = 0; x < width; x++)
@@ -102,7 +102,6 @@ public class OccupancyMap
             }
         }
 
-        // Then do the diffusion using the temp values, storing results in the original grid
         for (int y = 0; y < height; y++)
         {
             for (int x = 0; x < width; x++)
@@ -152,7 +151,7 @@ public class OccupancyMap
                 if (validNeighbors.Count == 0 || totalWeight <= 0f) continue;
 
                 // Update the current cell's value in the grid (keeping some value in the center)
-                grid.SetGridValue(x, y, value * 0.3f); // Keep 30% of the value in the current cell
+                grid.SetGridValue(x, y, value * 0.3f); 
 
                 // Distribute the remaining 70% to neighbors
                 float valueToDistribute = value * 0.7f;
@@ -165,7 +164,7 @@ public class OccupancyMap
             }
         }
 
-        // After diffusion, check if there are any significant values left
+        // After diffusion check if there are any significant values left
         bool hasValues = false;
         float highestValue = 0f;
 
