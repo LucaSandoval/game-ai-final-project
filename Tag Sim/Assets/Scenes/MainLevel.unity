@@ -688,6 +688,47 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7921614048966977711, guid: ef2d68bfa0e27b8459206fcc6b6378ab, type: 3}
   m_PrefabInstance: {fileID: 111014749}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &179835191 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2976603887695581269, guid: f4bab7ba38fc203429436af961c74530, type: 3}
+  m_PrefabInstance: {fileID: 4035076008432937089}
+  m_PrefabAsset: {fileID: 0}
+--- !u!58 &179835198
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 179835191}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_Radius: 0.5
 --- !u!1 &233670835
 GameObject:
   m_ObjectHideFlags: 0
@@ -1184,7 +1225,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72adff7465160284ab3969f530382f9b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MovementSpeed: 10
+  MovementSpeed: 5
   ArrivalDistance: 0.1
   DebugVisualization: 1
 --- !u!114 &530123068
@@ -8868,7 +8909,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2976603887695581269, guid: f4bab7ba38fc203429436af961c74530, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 179835198}
   m_SourcePrefab: {fileID: 100100000, guid: f4bab7ba38fc203429436af961c74530, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
