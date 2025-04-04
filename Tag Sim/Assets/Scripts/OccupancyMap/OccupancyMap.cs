@@ -6,6 +6,13 @@ public class OccupancyMap
     private GridMap grid;
     private Dictionary<Vector2Int, bool> occupiedTiles = new Dictionary<Vector2Int, bool>();
 
+    // Player prediction variables
+    private Vector2 lastPlayerPosition;
+    private Vector2 playerVelocity;
+    private float lastPlayerSpottedTime = -100f;
+    private List<Vector2Int> playerHistoryPositions = new List<Vector2Int>();
+    private const int MAX_HISTORY_SIZE = 10; // Store the last 10 positions
+
     public OccupancyMap(GridMap grid)
     {
         this.grid = grid;
@@ -60,28 +67,164 @@ public class OccupancyMap
     }
 
     /// <summary>
-    /// Updates visibility based on AI perception.
+    /// Updates the AI's knowledge about the player's position and velocity
     /// </summary>
-    public void UpdateVisibility(List<GridTile> visibleTiles)
+    public void UpdatePlayerKnowledge(Transform player, GridTile playerTile)
     {
-        // Clear all visibility first
+        if (player == null || playerTile == null) return;
+
+        Vector2 currentPlayerPos = player.position;
+        float timeSinceLastSpotted = Time.time - lastPlayerSpottedTime;
+
+        // Calculate player velocity if we've seen them before
+        if (lastPlayerSpottedTime > 0 && timeSinceLastSpotted < 1.0f)
+        {
+            Vector2 newVelocity = (currentPlayerPos - lastPlayerPosition) / timeSinceLastSpotted;
+
+            // Smooth velocity calculation (70% new, 30% old)
+            playerVelocity = Vector2.Lerp(playerVelocity, newVelocity, 0.7f);
+
+            Debug.Log($"Updated player velocity: {playerVelocity.x:F2}, {playerVelocity.y:F2}");
+        }
+
+        // Add to position history
+        Vector2Int gridPos = playerTile.GridCoordinate;
+
+        // Only add if it's a new position
+        if (playerHistoryPositions.Count == 0 || playerHistoryPositions[0] != gridPos)
+        {
+            playerHistoryPositions.Insert(0, gridPos);
+
+            // Trim history if too long
+            if (playerHistoryPositions.Count > MAX_HISTORY_SIZE)
+            {
+                playerHistoryPositions.RemoveAt(playerHistoryPositions.Count - 1);
+            }
+        }
+
+        lastPlayerPosition = currentPlayerPos;
+        lastPlayerSpottedTime = Time.time;
+    }
+
+    /// <summary>
+    /// Predicts where the player might be based on last known position and velocity
+    /// </summary>
+    private List<Vector2Int> PredictPlayerMovement(float timeSinceLastSeen)
+    {
+        List<Vector2Int> predictedPositions = new List<Vector2Int>();
+
+        // If we've never seen the player or it's been too long, return empty list
+        if (lastPlayerSpottedTime < 0 || playerHistoryPositions.Count == 0 || timeSinceLastSeen > 5.0f)
+        {
+            return predictedPositions;
+        }
+
+        // Base prediction on last known position
+        Vector2Int lastKnownPos = playerHistoryPositions[0];
+
+        // Use player velocity to predict future positions
+        // Estimate how far they could have gone in the time since last seen
+        float distanceCovered = playerVelocity.magnitude * timeSinceLastSeen;
+        int estimatedTiles = Mathf.CeilToInt(distanceCovered);
+
+        // Limit prediction distance
+        estimatedTiles = Mathf.Min(estimatedTiles, 8);
+
+        // Get player direction from velocity
+        Vector2 normalizedDir = playerVelocity.normalized;
+
+        // Add the primary prediction based on velocity
+        for (int i = 1; i <= estimatedTiles; i++)
+        {
+            // Calculate predicted position based on velocity
+            Vector2 predictedWorldPos = lastPlayerPosition + (normalizedDir * i);
+
+            // Convert to grid position
+            GridTile predictedTile = FindNearestTraversableTile(predictedWorldPos);
+            if (predictedTile != null)
+            {
+                predictedPositions.Add(predictedTile.GridCoordinate);
+
+                // Give higher weight to closer predictions
+                float weight = 1.0f - ((float)i / estimatedTiles);
+
+                // Add the prediction with diminishing weight based on distance
+                grid.SetGridValue(predictedTile.GridCoordinate.x, predictedTile.GridCoordinate.y,
+                                  Mathf.Max(grid.GetGridValue(predictedTile.GridCoordinate.x, predictedTile.GridCoordinate.y),
+                                  weight * 0.8f));
+            }
+        }
+
+        // Additionally, check places the player has been before
+        if (playerHistoryPositions.Count > 1)
+        {
+            for (int i = 1; i < playerHistoryPositions.Count; i++)
+            {
+                Vector2Int historyPos = playerHistoryPositions[i];
+
+                // Add a small weight to historical positions, diminishing with age
+                float historyWeight = 0.2f * (1.0f - ((float)i / playerHistoryPositions.Count));
+
+                if (grid.IsCoordinateWithinGrid(historyPos.x, historyPos.y))
+                {
+                    float currentValue = grid.GetGridValue(historyPos.x, historyPos.y);
+                    grid.SetGridValue(historyPos.x, historyPos.y, Mathf.Max(currentValue, historyWeight));
+
+                    predictedPositions.Add(historyPos);
+                }
+            }
+        }
+
+        return predictedPositions;
+    }
+
+    /// <summary>
+    /// Finds the nearest traversable tile to a world position
+    /// </summary>
+    private GridTile FindNearestTraversableTile(Vector2 worldPosition)
+    {
+        // First try direct conversion
+        GridTile tile = null;
+
+        // This depends on your GridComponent implementation for converting world to grid
+        // You might need to adjust this based on your actual grid system
+        if (GridComponent.Instance != null)
+        {
+            tile = GridComponent.Instance.GetGridTileAtWorldPosition(worldPosition);
+
+            // If valid, return it
+            if (tile != null && tile.Traversable)
+            {
+                return tile;
+            }
+        }
+
+        // Otherwise, search nearby tiles
         var (width, height) = grid.GetGridSize();
+        float closestDistance = float.MaxValue;
+        GridTile closestTile = null;
+
+        // Search in a limited radius to keep performance reasonable
+        const int SEARCH_RADIUS = 5;
 
         for (int y = 0; y < height; y++)
         {
             for (int x = 0; x < width; x++)
             {
-                GridTile tile = grid.GetTile(x, y);
-                if (tile != null)
-                    tile.Visible = false;
+                GridTile candidateTile = grid.GetTile(x, y);
+                if (candidateTile != null && candidateTile.Traversable)
+                {
+                    float distance = Vector2.Distance(worldPosition, candidateTile.WorldPosition);
+                    if (distance < closestDistance && distance < SEARCH_RADIUS)
+                    {
+                        closestDistance = distance;
+                        closestTile = candidateTile;
+                    }
+                }
             }
         }
 
-        // Set visibility for current frame
-        foreach (GridTile tile in visibleTiles)
-        {
-            tile.Visible = true;
-        }
+        return closestTile;
     }
 
     /// <summary>
@@ -93,7 +236,7 @@ public class OccupancyMap
         float[,] tempValues = new float[grid.GetGridSize().Item1, grid.GetGridSize().Item2];
         var (width, height) = grid.GetGridSize();
 
-        // Copy all current values to our temp array
+        // First, copy all current values to our temp array
         for (int y = 0; y < height; y++)
         {
             for (int x = 0; x < width; x++)
@@ -102,6 +245,7 @@ public class OccupancyMap
             }
         }
 
+        // Then do the diffusion using the temp values, storing results in the original grid
         for (int y = 0; y < height; y++)
         {
             for (int x = 0; x < width; x++)
@@ -151,7 +295,7 @@ public class OccupancyMap
                 if (validNeighbors.Count == 0 || totalWeight <= 0f) continue;
 
                 // Update the current cell's value in the grid (keeping some value in the center)
-                grid.SetGridValue(x, y, value * 0.3f); 
+                grid.SetGridValue(x, y, value * 0.3f); // Keep 30% of the value in the current cell
 
                 // Distribute the remaining 70% to neighbors
                 float valueToDistribute = value * 0.7f;
@@ -164,7 +308,14 @@ public class OccupancyMap
             }
         }
 
-        // After diffusion check if there are any significant values left
+        // Special case: If we've seen the player recently, add predictions
+        float timeSinceLastSeen = Time.time - lastPlayerSpottedTime;
+        if (lastPlayerSpottedTime > 0 && timeSinceLastSeen < 5.0f)
+        {
+            PredictPlayerMovement(timeSinceLastSeen);
+        }
+
+        // After diffusion, check if there are any significant values left
         bool hasValues = false;
         float highestValue = 0f;
 
@@ -193,7 +344,7 @@ public class OccupancyMap
     /// <summary>
     /// Clears the entire grid and sets a single tile to maximum value
     /// </summary>
-    public void ClearAndSetSingle(GridTile tile)
+    public void ClearAndSetSingle(GridTile tile, Transform player = null)
     {
         for (int y = 0; y < grid.GetGridSize().Item2; y++)
         {
@@ -207,6 +358,12 @@ public class OccupancyMap
         {
             grid.SetGridValue(tile.GridCoordinate.x, tile.GridCoordinate.y, 1f);
             Debug.Log($"Set tile at {tile.GridCoordinate} to 1.0 (player location)");
+
+            // If player transform was provided, update our knowledge of the player
+            if (player != null)
+            {
+                UpdatePlayerKnowledge(player, tile);
+            }
         }
     }
 
@@ -241,7 +398,30 @@ public class OccupancyMap
             if (hasValues) break;
         }
 
-        // If no values remain, seed a new random value
+        // If we've seen the player relatively recently, make predictions
+        float timeSinceLastSeen = Time.time - lastPlayerSpottedTime;
+        if (lastPlayerSpottedTime > 0 && timeSinceLastSeen < 5.0f)
+        {
+            // Add player movement predictions to the grid
+            PredictPlayerMovement(timeSinceLastSeen);
+
+            // Double-check if we have values after prediction
+            hasValues = false;
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    if (grid.GetGridValue(x, y) > 0.01f)
+                    {
+                        hasValues = true;
+                        break;
+                    }
+                }
+                if (hasValues) break;
+            }
+        }
+
+        // If no values remain after all that, seed a new random value
         if (!hasValues)
         {
             Debug.Log("No values remain after clearing visible tiles. Seeding new patrol point.");

@@ -9,6 +9,12 @@ public class AIController : MonoBehaviour
     [SerializeField] private float guessCooldown = 0.75f;
     [SerializeField] private float forgetPlayerDelay = 2f;
     [SerializeField] private float patrolUpdateFrequency = 1.5f;
+    [SerializeField] private bool useSmartPrediction = true; // Toggle for the smart prediction behavior
+
+    [Header("Advanced AI Settings")]
+    [SerializeField, Range(0.5f, 10f)] private float predictionRadius = 3f; // How far ahead to predict player movement
+    [SerializeField, Range(0.7f, 0.99f)] private float diffusionRate = 0.95f; // How quickly suspicion diffuses
+    [SerializeField, Range(0.1f, 3f)] private float targetReachedThreshold = 0.5f; // How close AI needs to be to consider target reached
 
     private PathfindingComponent pathfinding;
     private PerceptionComponent perception;
@@ -23,6 +29,9 @@ public class AIController : MonoBehaviour
     private float lastPatrolUpdateTime = 0f;
     private bool isChasingPlayer = false;
     private bool isPatrolling = false;
+
+    // For visualization
+    private List<GridTile> highlightedTiles = new List<GridTile>();
 
     private void Start()
     {
@@ -66,15 +75,16 @@ public class AIController : MonoBehaviour
         // Regularly update patrol behavior when not chasing
         if (!isChasingPlayer)
         {
+            // Periodically check for a new patrol target
             if (Time.time - lastPatrolUpdateTime > patrolUpdateFrequency)
             {
                 TryResumePatrol();
                 lastPatrolUpdateTime = Time.time;
             }
 
-            // If reached our target or don't have one, get a new one
+            // If we've reached our target or don't have one, get a new one
             if (currentTargetGuess != null &&
-                Vector2.Distance(transform.position, currentTargetGuess.WorldPosition) < 0.5f)
+                Vector2.Distance(transform.position, currentTargetGuess.WorldPosition) < targetReachedThreshold)
             {
                 Debug.Log("Reached patrol target. Finding a new one.");
                 TryResumePatrol();
@@ -98,11 +108,13 @@ public class AIController : MonoBehaviour
 
     private void UpdatePerceptionAndOccupancy()
     {
-        if (perception.GetSeenPlayer() != null)
+        Transform playerTransform = perception.GetSeenPlayer();
+
+        if (playerTransform != null)
         {
             lastSeenPlayerTime = Time.time;
 
-            //Do you ever chase the player
+            // Only announce when transitioning from not chasing to chasing
             if (!isChasingPlayer)
             {
                 Debug.Log("Player spotted! Beginning chase.");
@@ -112,10 +124,11 @@ public class AIController : MonoBehaviour
             isPatrolling = false;
 
             // Set player's position as the only occupancy value
-            GridTile playerTile = grid.GetGridTileAtWorldPosition(perception.GetSeenPlayer().position);
+            GridTile playerTile = grid.GetGridTileAtWorldPosition(playerTransform.position);
             if (playerTile != null)
             {
-                occupancyMap.ClearAndSetSingle(playerTile);
+                // Pass the player transform for velocity tracking
+                occupancyMap.ClearAndSetSingle(playerTile, playerTransform);
             }
         }
         else
@@ -124,9 +137,9 @@ public class AIController : MonoBehaviour
             occupancyMap.ClearVisible(perception.GetVisibleTiles());
 
             // Only diffuse if we're not directly chasing the player
-            if (!isChasingPlayer)
+            if (!isChasingPlayer || Time.time - lastSeenPlayerTime > 0.5f)
             {
-                occupancyMap.Diffuse(0.95f);
+                occupancyMap.Diffuse(diffusionRate);
             }
         }
     }
@@ -163,14 +176,44 @@ public class AIController : MonoBehaviour
             }
             else
             {
-                // Continue moving toward last known position (handled by pathfinding)
-                // The occupancy map will handle the diffusion of the last known position
+                // Continue hunting for player based on last known position and predictions
+                TrySearchNearLastSeen();
             }
         }
         else if (!isPatrolling ||
-                (currentTargetGuess != null && Vector2.Distance(transform.position, currentTargetGuess.WorldPosition) < 0.5f))
+                (currentTargetGuess != null && Vector2.Distance(transform.position, currentTargetGuess.WorldPosition) < targetReachedThreshold))
         {
+            // If we're not patrolling or have reached our target, find a new patrol target
             TryResumePatrol();
+        }
+    }
+
+    /// <summary>
+    /// Updates the AI's destination to search near the last seen position of the player
+    /// </summary>
+    private void TrySearchNearLastSeen()
+    {
+        GridTile bestGuess = occupancyMap.GetMostLikelyTile();
+        if (bestGuess == null) return;
+
+        if (currentTargetGuess != bestGuess)
+        {
+            // Clear previous target marker
+            if (currentTargetGuess != null)
+            {
+                currentTargetGuess.IsTargetGuess = false;
+            }
+
+            // Mark new target
+            currentTargetGuess = bestGuess;
+            currentTargetGuess.IsTargetGuess = true;
+
+            // Set destination
+            pathfinding.SetDestination(currentTargetGuess.WorldPosition);
+
+            Debug.DrawLine(transform.position, currentTargetGuess.WorldPosition, Color.red, 0.5f);
+            Debug.Log($"Searching for player at {currentTargetGuess.GridCoordinate} with value " +
+                     $"{grid.GetGridData().GetGridValue(currentTargetGuess.GridCoordinate.x, currentTargetGuess.GridCoordinate.y)}");
         }
     }
 
@@ -198,5 +241,36 @@ public class AIController : MonoBehaviour
         Debug.Log($"Patrolling to {currentTargetGuess.GridCoordinate} with value {grid.GetGridData().GetGridValue(currentTargetGuess.GridCoordinate.x, currentTargetGuess.GridCoordinate.y)}");
 
         pathfinding.SetDestination(currentTargetGuess.WorldPosition);
+    }
+
+    private void OnDrawGizmos()
+    {
+        if (!Application.isPlaying || occupancyMap == null || grid == null) return;
+
+        // Visualize the AI's current mode
+        if (isChasingPlayer)
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(transform.position, 0.7f);
+        }
+        else if (isPatrolling)
+        {
+            Gizmos.color = Color.cyan;
+            Gizmos.DrawWireSphere(transform.position, 0.7f);
+        }
+
+        // Draw line to current target if we have one
+        if (currentTargetGuess != null)
+        {
+            if (isChasingPlayer)
+                Gizmos.color = Color.red;
+            else
+                Gizmos.color = Color.cyan;
+
+            Gizmos.DrawLine(transform.position, currentTargetGuess.WorldPosition);
+
+            // Draw target marker
+            Gizmos.DrawWireCube(currentTargetGuess.WorldPosition, Vector3.one * 0.5f);
+        }
     }
 }
