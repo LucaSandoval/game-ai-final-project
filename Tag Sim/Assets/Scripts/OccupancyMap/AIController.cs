@@ -15,6 +15,7 @@ public class AIController : MonoBehaviour
     [SerializeField, Range(0.5f, 10f)] private float predictionRadius = 3f; // How far ahead to predict player movement
     [SerializeField, Range(0.7f, 0.99f)] private float diffusionRate = 0.95f; // How quickly suspicion diffuses
     [SerializeField, Range(0.1f, 3f)] private float targetReachedThreshold = 0.5f; // How close AI needs to be to consider target reached
+    [SerializeField, Range(0f, 5f)] private float minTargetDwellTime = 1f; // Min time to spend at target before choosing new one
 
     private PathfindingComponent pathfinding;
     private PerceptionComponent perception;
@@ -27,8 +28,10 @@ public class AIController : MonoBehaviour
     private float lastGuessTime;
     private float lastSeenPlayerTime = -Mathf.Infinity;
     private float lastPatrolUpdateTime = 0f;
+    private float targetReachedTime = 0f; // When we reached the current target
     private bool isChasingPlayer = false;
     private bool isPatrolling = false;
+    private bool isWaitingAtTarget = false;
 
     // For visualization
     private List<GridTile> highlightedTiles = new List<GridTile>();
@@ -72,22 +75,41 @@ public class AIController : MonoBehaviour
         UpdatePerceptionAndOccupancy();
         UpdateBehavior();
 
+        // Check if we've reached our current target
+        if (currentTargetGuess != null &&
+            Vector2.Distance(transform.position, currentTargetGuess.WorldPosition) < targetReachedThreshold)
+        {
+            // If we just reached the target, record the time
+            if (!isWaitingAtTarget)
+            {
+                targetReachedTime = Time.time;
+                isWaitingAtTarget = true;
+                Debug.Log($"Reached target at {currentTargetGuess.GridCoordinate}. Waiting for {minTargetDwellTime} seconds.");
+            }
+        }
+        else
+        {
+            // Reset waiting state if we moved away from target
+            isWaitingAtTarget = false;
+        }
+
         // Regularly update patrol behavior when not chasing
         if (!isChasingPlayer)
         {
-            // Periodically check for a new patrol target
-            if (Time.time - lastPatrolUpdateTime > patrolUpdateFrequency)
+            // Choose a new patrol target periodically OR when we've been at our current target long enough
+            bool shouldUpdatePatrol = Time.time - lastPatrolUpdateTime > patrolUpdateFrequency;
+            bool dwellTimeElapsed = isWaitingAtTarget && Time.time - targetReachedTime > minTargetDwellTime;
+
+            if (shouldUpdatePatrol || dwellTimeElapsed)
             {
+                if (dwellTimeElapsed)
+                {
+                    Debug.Log($"Dwell time elapsed at {currentTargetGuess.GridCoordinate}. Finding new target.");
+                }
+
                 TryResumePatrol();
                 lastPatrolUpdateTime = Time.time;
-            }
-
-            // If we've reached our target or don't have one, get a new one
-            if (currentTargetGuess != null &&
-                Vector2.Distance(transform.position, currentTargetGuess.WorldPosition) < targetReachedThreshold)
-            {
-                Debug.Log("Reached patrol target. Finding a new one.");
-                TryResumePatrol();
+                isWaitingAtTarget = false;
             }
         }
     }
@@ -103,44 +125,57 @@ public class AIController : MonoBehaviour
         }
 
         currentTile.Occupied = true;
+
+        
+        var gridData = grid.GetGridData();
+        if (gridData != null)
+        {
+            gridData.SetGridValue(currentTile.GridCoordinate.x, currentTile.GridCoordinate.y, 0f);
+        }
+
         previousTile = currentTile;
     }
 
+
     private void UpdatePerceptionAndOccupancy()
     {
-        Transform playerTransform = perception.GetSeenPlayer();
+        // Refresh what AI can see
+        perception.UpdatePerception();
 
-        if (playerTransform != null)
+        List<GridTile> visibleTiles = perception.GetVisibleTiles();
+
+        if (perception.GetSeenPlayer() != null)
         {
             lastSeenPlayerTime = Time.time;
-
-            // Only announce when transitioning from not chasing to chasing
-            if (!isChasingPlayer)
-            {
-                Debug.Log("Player spotted! Beginning chase.");
-            }
-
             isChasingPlayer = true;
-            isPatrolling = false;
 
-            // Set player's position as the only occupancy value
-            GridTile playerTile = grid.GetGridTileAtWorldPosition(playerTransform.position);
+            GridTile playerTile = grid.GetGridTileAtWorldPosition(perception.GetSeenPlayer().position);
             if (playerTile != null)
             {
-                // Pass the player transform for velocity tracking
-                occupancyMap.ClearAndSetSingle(playerTile, playerTransform);
+                // When player is seen, clear the map and just mark player's position
+                occupancyMap.ClearAndSetSingle(playerTile, perception.GetSeenPlayer());
             }
         }
         else
         {
-            // Player not seen, update occupancy map
-            occupancyMap.ClearVisible(perception.GetVisibleTiles());
+            // Clear visible tiles first, THEN diffuse
+            occupancyMap.ClearVisible(visibleTiles);
 
-            // Only diffuse if we're not directly chasing the player
-            if (!isChasingPlayer || Time.time - lastSeenPlayerTime > 0.5f)
+            // Only diffuse suspicion when player is not seen
+            if (Time.time - lastSeenPlayerTime > 0.5f) // Small delay before starting to guess
             {
                 occupancyMap.Diffuse(diffusionRate);
             }
+        }
+    }
+
+    private void ClearMemoryWhenPlayerSpotted()
+    {
+        Transform player = perception.GetSeenPlayer();
+        if (player != null)
+        {
+            // When directly seeing the player, clear all previous memory and start fresh
+            occupancyMap.ClearRecentMemory();
         }
     }
 
@@ -156,6 +191,7 @@ public class AIController : MonoBehaviour
             lastSeenPlayerTime = Time.time;
             isChasingPlayer = true;
             isPatrolling = false;
+            isWaitingAtTarget = false;
 
             // Mark current target as no longer a target
             if (currentTargetGuess != null)
@@ -172,18 +208,21 @@ public class AIController : MonoBehaviour
                 Debug.Log("Lost sight of player for " + forgetPlayerDelay + " seconds. Returning to patrol.");
                 isChasingPlayer = false;
                 isPatrolling = false;
+                isWaitingAtTarget = false;
                 TryResumePatrol();
             }
             else
             {
                 // Continue hunting for player based on last known position and predictions
-                TrySearchNearLastSeen();
+                if (!isWaitingAtTarget)
+                {
+                    TrySearchNearLastSeen();
+                }
             }
         }
-        else if (!isPatrolling ||
-                (currentTargetGuess != null && Vector2.Distance(transform.position, currentTargetGuess.WorldPosition) < targetReachedThreshold))
+        else if (!isPatrolling && !isWaitingAtTarget)
         {
-            // If we're not patrolling or have reached our target, find a new patrol target
+            // If we're not patrolling and not waiting at a target, find a new patrol target
             TryResumePatrol();
         }
     }
@@ -196,25 +235,30 @@ public class AIController : MonoBehaviour
         GridTile bestGuess = occupancyMap.GetMostLikelyTile();
         if (bestGuess == null) return;
 
-        if (currentTargetGuess != bestGuess)
+        // Don't update target if we're very close to current one
+        if (currentTargetGuess != null &&
+            Vector2.Distance(currentTargetGuess.WorldPosition, bestGuess.WorldPosition) < 1.0f &&
+            Vector2.Distance(transform.position, currentTargetGuess.WorldPosition) < targetReachedThreshold * 2f)
         {
-            // Clear previous target marker
-            if (currentTargetGuess != null)
-            {
-                currentTargetGuess.IsTargetGuess = false;
-            }
-
-            // Mark new target
-            currentTargetGuess = bestGuess;
-            currentTargetGuess.IsTargetGuess = true;
-
-            // Set destination
-            pathfinding.SetDestination(currentTargetGuess.WorldPosition);
-
-            Debug.DrawLine(transform.position, currentTargetGuess.WorldPosition, Color.red, 0.5f);
-            Debug.Log($"Searching for player at {currentTargetGuess.GridCoordinate} with value " +
-                     $"{grid.GetGridData().GetGridValue(currentTargetGuess.GridCoordinate.x, currentTargetGuess.GridCoordinate.y)}");
+            return; // Keep current target to avoid jitter
         }
+
+        // Clear previous target marker
+        if (currentTargetGuess != null)
+        {
+            currentTargetGuess.IsTargetGuess = false;
+        }
+
+        // Mark new target
+        currentTargetGuess = bestGuess;
+        currentTargetGuess.IsTargetGuess = true;
+
+        // Set destination
+        pathfinding.SetDestination(currentTargetGuess.WorldPosition);
+
+        Debug.DrawLine(transform.position, currentTargetGuess.WorldPosition, Color.red, 0.5f);
+        Debug.Log($"Searching for player at {currentTargetGuess.GridCoordinate} with value " +
+                 $"{grid.GetGridData().GetGridValue(currentTargetGuess.GridCoordinate.x, currentTargetGuess.GridCoordinate.y)}");
     }
 
     private void TryResumePatrol()
@@ -222,8 +266,114 @@ public class AIController : MonoBehaviour
         GridTile bestGuess = occupancyMap.GetMostLikelyTile();
         if (bestGuess == null)
         {
-            Debug.Log("TryResumePatrol: No guess available, will try again soon.");
-            return;
+            // Pick a random traversable tile to keep moving
+            var (width, height) = grid.GetGridData().GetGridSize();
+            List<GridTile> fallback = new();
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    GridTile tile = grid.GetGridData().GetTile(x, y);
+                    if (tile != null && tile.Traversable && !tile.Occupied)
+                        fallback.Add(tile);
+                }
+            }
+
+            if (fallback.Count > 0)
+            {
+                bestGuess = fallback[Random.Range(0, fallback.Count)];
+                Debug.Log("TryResumePatrol: No likely tile, defaulting to random fallback.");
+            }
+            else
+            {
+                Debug.Log("TryResumePatrol: No fallback available.");
+                return;
+            }
+        }
+
+        // Don't pick the same target or one too close to current position
+        if (currentTargetGuess == bestGuess ||
+            (Vector2.Distance(transform.position, bestGuess.WorldPosition) < targetReachedThreshold && !isWaitingAtTarget))
+        {
+            Debug.Log("TryResumePatrol: Selected target is too close or same as current. Picking another.");
+
+            // Try to find a different target
+            var (width, height) = grid.GetGridData().GetGridSize();
+            List<GridTile> alternatives = new();
+
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    GridTile tile = grid.GetGridData().GetTile(x, y);
+                    float value = grid.GetGridData().GetGridValue(x, y);
+
+                    // Consider tiles with some value and sufficient distance
+                    if (tile != null && tile.Traversable && !tile.Occupied &&
+                        value > 0.01f && Vector2.Distance(transform.position, tile.WorldPosition) > targetReachedThreshold * 3f)
+                    {
+                        alternatives.Add(tile);
+                    }
+                }
+            }
+
+            // If we found alternatives, pick one randomly from the top values
+            if (alternatives.Count > 0)
+            {
+                // Sort by value
+                alternatives.Sort((a, b) =>
+                {
+                    float valueA = grid.GetGridData().GetGridValue(a.GridCoordinate.x, a.GridCoordinate.y);
+                    float valueB = grid.GetGridData().GetGridValue(b.GridCoordinate.x, b.GridCoordinate.y);
+                    return valueB.CompareTo(valueA); // Descending order
+                });
+
+                // Take top 20% or at least 1
+                int topCount = Mathf.Max(1, alternatives.Count / 5);
+                bestGuess = alternatives[Random.Range(0, topCount)];
+                Debug.Log($"Selected alternative target from top {topCount} options");
+            }
+            // If no alternatives, check if we're waiting 
+            else if (isWaitingAtTarget && Time.time - targetReachedTime < minTargetDwellTime)
+            {
+                // Continue waiting
+                Debug.Log($"No alternatives found, continuing to wait at current target.");
+                return;
+            }
+            // Last resort: random position far from current
+            else
+            {
+                List<GridTile> farTiles = new();
+                for (int y = 0; y < height; y++)
+                {
+                    for (int x = 0; x < width; x++)
+                    {
+                        GridTile tile = grid.GetGridData().GetTile(x, y);
+                        if (tile != null && tile.Traversable && !tile.Occupied &&
+                            Vector2.Distance(transform.position, tile.WorldPosition) > targetReachedThreshold * 5f)
+                        {
+                            farTiles.Add(tile);
+                        }
+                    }
+                }
+
+                if (farTiles.Count > 0)
+                {
+                    bestGuess = farTiles[Random.Range(0, farTiles.Count)];
+                    Debug.Log("Selected random distant tile as fallback patrol target");
+                }
+                else
+                {
+                    // Truly last resort - force a minimum wait time
+                    if (!isWaitingAtTarget)
+                    {
+                        isWaitingAtTarget = true;
+                        targetReachedTime = Time.time;
+                        Debug.Log("No suitable patrol targets found. Waiting at current position.");
+                    }
+                    return;
+                }
+            }
         }
 
         // Clear previous target marker
@@ -236,6 +386,7 @@ public class AIController : MonoBehaviour
         currentTargetGuess = bestGuess;
         currentTargetGuess.IsTargetGuess = true;
         isPatrolling = true;
+        isWaitingAtTarget = false;
 
         Debug.DrawLine(transform.position, currentTargetGuess.WorldPosition, Color.cyan, 2f);
         Debug.Log($"Patrolling to {currentTargetGuess.GridCoordinate} with value {grid.GetGridData().GetGridValue(currentTargetGuess.GridCoordinate.x, currentTargetGuess.GridCoordinate.y)}");
@@ -245,7 +396,7 @@ public class AIController : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        if (!Application.isPlaying || occupancyMap == null || grid == null) return;
+        if (!Application.isPlaying || grid == null) return;
 
         // Visualize the AI's current mode
         if (isChasingPlayer)
@@ -255,7 +406,7 @@ public class AIController : MonoBehaviour
         }
         else if (isPatrolling)
         {
-            Gizmos.color = Color.cyan;
+            Gizmos.color = isWaitingAtTarget ? Color.yellow : Color.cyan;
             Gizmos.DrawWireSphere(transform.position, 0.7f);
         }
 
@@ -264,6 +415,8 @@ public class AIController : MonoBehaviour
         {
             if (isChasingPlayer)
                 Gizmos.color = Color.red;
+            else if (isWaitingAtTarget)
+                Gizmos.color = Color.yellow;
             else
                 Gizmos.color = Color.cyan;
 
@@ -271,6 +424,32 @@ public class AIController : MonoBehaviour
 
             // Draw target marker
             Gizmos.DrawWireCube(currentTargetGuess.WorldPosition, Vector3.one * 0.5f);
+        }
+
+        // Draw debug visualization of the occupancy grid
+        if (occupancyMap != null && grid != null)
+        {
+            var (width, height) = grid.GetGridData().GetGridSize();
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    float value = grid.GetGridData().GetGridValue(x, y);
+                    if (value > 0.05f)
+                    {
+                        GridTile tile = grid.GetGridData().GetTile(x, y);
+                        if (tile != null)
+                        {
+                            // Normalized size based on value (0.05f to 1.0f) 
+                            float size = Mathf.Lerp(0.1f, 0.4f, Mathf.Clamp01(value));
+
+                            // Color fades from green (low) to red (high)
+                            Gizmos.color = Color.Lerp(Color.green, Color.red, Mathf.Clamp01(value));
+                            Gizmos.DrawCube(tile.WorldPosition, Vector3.one * size);
+                        }
+                    }
+                }
+            }
         }
     }
 }
