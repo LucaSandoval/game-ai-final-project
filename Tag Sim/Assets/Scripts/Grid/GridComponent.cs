@@ -249,14 +249,7 @@ public class GridComponent : Singleton<GridComponent>
                     Vector2 screenPos = Camera.main.WorldToScreenPoint(tile.WorldPosition);
                     float flippedY = Screen.height - screenPos.y;
 
-                    string label = "";
-
-                    if (tile.IsTargetGuess) label = "T";
-                    else
-                    {
-                        if (tile.Occupied) label += "X";
-                        if (tile.Visible) label += "O";
-                    }
+                    string label = tile.Value.ToString("F1");
 
                     if (!string.IsNullOrEmpty(label))
                     {
@@ -281,26 +274,28 @@ public class GridComponent : Singleton<GridComponent>
                     GridTile tile = mainGrid.GetTile(w, h);
                     Vector2 pos = tile.WorldPosition;
 
-                    float timeUnseen = Time.time - tile.LastSeenTime;
+                    //float timeUnseen = Time.time - tile.LastSeenTime;
 
-                    if (tile.IsTargetGuess)
-                    {
-                        Gizmos.color = Color.magenta;
-                        Gizmos.DrawCube(pos, Vector3.one * 0.6f);
-                    }
-                    else if (tile.Occupied)
-                    {
-                        Gizmos.color = Color.red;
-                        Gizmos.DrawCube(pos, Vector3.one * 0.5f);
-                    }
-                    else
-                    {
-                        // Draw a suspicion heatmap — more "red" the longer it's been unseen
-                        float intensity = Mathf.Clamp01(timeUnseen / 10f); // 0 (just seen) → 1 (unseen for 10+ seconds)
-                        Gizmos.color = Color.Lerp(Color.green, Color.red, intensity);
-                        Gizmos.DrawCube(pos, Vector3.one * 0.4f);
-                    }
+                    //if (tile.IsTargetGuess)
+                    //{
+                    //    Gizmos.color = Color.magenta;
+                    //    Gizmos.DrawCube(pos, Vector3.one * 0.6f);
+                    //}
+                    //else if (tile.Occupied)
+                    //{
+                    //    Gizmos.color = Color.red;
+                    //    Gizmos.DrawCube(pos, Vector3.one * 0.5f);
+                    //}
+                    //else
+                    //{
+                    //    // Draw a suspicion heatmap — more "red" the longer it's been unseen
+                    //    float intensity = Mathf.Clamp01(timeUnseen / 10f); // 0 (just seen) → 1 (unseen for 10+ seconds)
+                    //    Gizmos.color = Color.Lerp(Color.green, Color.red, intensity);
+                    //    Gizmos.DrawCube(pos, Vector3.one * 0.4f);
+                    //}
 
+                    Gizmos.color = Color.Lerp(Color.green, Color.red, tile.Value);
+                    Gizmos.DrawCube(pos, Vector3.one * 0.4f);
                 }
             }
         }
