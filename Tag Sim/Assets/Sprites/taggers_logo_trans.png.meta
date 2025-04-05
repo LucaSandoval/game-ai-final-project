@@ -1,0 +1,585 @@
+fileFormatVersion: 2
+guid: a4d8d5934c8778d44929a368ff591d3a
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -2138991775489641757
+    second: taggers_logo_trans_0
+  - first:
+      213: 4814066221075455466
+    second: taggers_logo_trans_1
+  - first:
+      213: -6556609999885502782
+    second: taggers_logo_trans_2
+  - first:
+      213: -4500582538686742395
+    second: taggers_logo_trans_3
+  - first:
+      213: 5794321101882120739
+    second: taggers_logo_trans_4
+  - first:
+      213: 2193420657344091923
+    second: taggers_logo_trans_5
+  - first:
+      213: -4471192626849852986
+    second: taggers_logo_trans_6
+  - first:
+      213: 6976236494107273266
+    second: taggers_logo_trans_7
+  - first:
+      213: -5440492732754694201
+    second: taggers_logo_trans_8
+  - first:
+      213: 715867389993646536
+    second: taggers_logo_trans_9
+  - first:
+      213: -5163529743320104902
+    second: taggers_logo_trans_10
+  - first:
+      213: -5263630511649226695
+    second: taggers_logo_trans_11
+  - first:
+      213: 3398504900104989569
+    second: taggers_logo_trans_12
+  - first:
+      213: -7023798496921883236
+    second: taggers_logo_trans_13
+  - first:
+      213: 7315167451107496492
+    second: taggers_logo_trans_14
+  - first:
+      213: 5834046108586590510
+    second: taggers_logo_trans_15
+  - first:
+      213: 6545280512238822419
+    second: taggers_logo_trans_16
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: iOS
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: taggers_logo_trans_0
+      rect:
+        serializedVersion: 2
+        x: 152
+        y: 182
+        width: 26
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3e235742056c052e0800000000000000
+      internalID: -2138991775489641757
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: taggers_logo_trans_1
+      rect:
+        serializedVersion: 2
+        x: 175
+        y: 226
+        width: 115
+        height: 61
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: aedd868d8bffec240800000000000000
+      internalID: 4814066221075455466
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: taggers_logo_trans_2
+      rect:
+        serializedVersion: 2
+        x: 177
+        y: 149
+        width: 81
+        height: 82
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2c6fc0a81fd3205a0800000000000000
+      internalID: -6556609999885502782
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: taggers_logo_trans_3
+      rect:
+        serializedVersion: 2
+        x: 224
+        y: 210
+        width: 48
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5804043b608ba81c0800000000000000
+      internalID: -4500582538686742395
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: taggers_logo_trans_4
+      rect:
+        serializedVersion: 2
+        x: 253
+        y: 173
+        width: 37
+        height: 67
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 32adb30b750996050800000000000000
+      internalID: 5794321101882120739
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: taggers_logo_trans_5
+      rect:
+        serializedVersion: 2
+        x: 260
+        y: 149
+        width: 8
+        height: 45
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3179ff37778907e10800000000000000
+      internalID: 2193420657344091923
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: taggers_logo_trans_6
+      rect:
+        serializedVersion: 2
+        x: 41
+        y: 120
+        width: 359
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6c1d44acef123f1c0800000000000000
+      internalID: -4471192626849852986
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: taggers_logo_trans_7
+      rect:
+        serializedVersion: 2
+        x: 58
+        y: 66
+        width: 42
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2386164312290d060800000000000000
+      internalID: 6976236494107273266
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: taggers_logo_trans_8
+      rect:
+        serializedVersion: 2
+        x: 92
+        y: 66
+        width: 50
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7cfef0d3fac7f74b0800000000000000
+      internalID: -5440492732754694201
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: taggers_logo_trans_9
+      rect:
+        serializedVersion: 2
+        x: 145
+        y: 65
+        width: 45
+        height: 52
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8c97bde29954fe900800000000000000
+      internalID: 715867389993646536
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: taggers_logo_trans_10
+      rect:
+        serializedVersion: 2
+        x: 193
+        y: 65
+        width: 45
+        height: 52
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a30cd365e057758b0800000000000000
+      internalID: -5163529743320104902
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: taggers_logo_trans_11
+      rect:
+        serializedVersion: 2
+        x: 242
+        y: 66
+        width: 37
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9308d3400f3d3f6b0800000000000000
+      internalID: -5263630511649226695
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: taggers_logo_trans_12
+      rect:
+        serializedVersion: 2
+        x: 284
+        y: 66
+        width: 41
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 18bae2a533ae92f20800000000000000
+      internalID: 3398504900104989569
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: taggers_logo_trans_13
+      rect:
+        serializedVersion: 2
+        x: 328
+        y: 65
+        width: 38
+        height: 52
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c9d6c011b74768e90800000000000000
+      internalID: -7023798496921883236
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: taggers_logo_trans_14
+      rect:
+        serializedVersion: 2
+        x: 369
+        y: 79
+        width: 13
+        height: 37
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c2213c31a02b48560800000000000000
+      internalID: 7315167451107496492
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: taggers_logo_trans_15
+      rect:
+        serializedVersion: 2
+        x: 369
+        y: 66
+        width: 13
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e21cd819602b6f050800000000000000
+      internalID: 5834046108586590510
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: taggers_logo_trans_16
+      rect:
+        serializedVersion: 2
+        x: 41
+        y: 47
+        width: 359
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 314284f82f185da50800000000000000
+      internalID: 6545280512238822419
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      taggers_logo_trans_0: -2138991775489641757
+      taggers_logo_trans_1: 4814066221075455466
+      taggers_logo_trans_10: -5163529743320104902
+      taggers_logo_trans_11: -5263630511649226695
+      taggers_logo_trans_12: 3398504900104989569
+      taggers_logo_trans_13: -7023798496921883236
+      taggers_logo_trans_14: 7315167451107496492
+      taggers_logo_trans_15: 5834046108586590510
+      taggers_logo_trans_16: 6545280512238822419
+      taggers_logo_trans_2: -6556609999885502782
+      taggers_logo_trans_3: -4500582538686742395
+      taggers_logo_trans_4: 5794321101882120739
+      taggers_logo_trans_5: 2193420657344091923
+      taggers_logo_trans_6: -4471192626849852986
+      taggers_logo_trans_7: 6976236494107273266
+      taggers_logo_trans_8: -5440492732754694201
+      taggers_logo_trans_9: 715867389993646536
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
