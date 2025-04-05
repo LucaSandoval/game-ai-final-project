@@ -126,4 +126,40 @@ public class GridMap
         return (width, height);
     }
 
+    /// <summary>
+    /// Normalizes all the values of the grid map, providing an even distribution
+    /// </summary>
+    public void Normalize()
+    {
+        // First, find the min and max value of the array.
+        float MaxValue = 0;
+        float MinValue = 0;
+
+        for(int y = 0; y < height; y++)
+        {
+            for(int x = 0; x < width; x++)
+            {
+                if (tiles[x, y].Value != float.MaxValue)
+                {
+                    MaxValue = Mathf.Max(MaxValue, tiles[x, y].Value);
+                    MinValue = Mathf.Min(MinValue, tiles[x, y].Value);
+                }
+            }
+        }
+
+        // Prevent possible division by zero
+        if (MaxValue == MinValue) return;
+
+        // Normalize all numbers
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                if (tiles[x, y].Value != float.MaxValue)
+                {
+                    tiles[x, y].Value = (tiles[x, y].Value - MinValue) / (MaxValue - MinValue);
+                }
+            }
+        }
+    }
 }

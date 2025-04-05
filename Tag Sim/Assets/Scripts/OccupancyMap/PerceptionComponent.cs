@@ -5,181 +5,106 @@ using Unity.VisualScripting;
 public class PerceptionComponent : MonoBehaviour
 {
     [Header("Perception Settings")]
-    [SerializeField] private float maxVisionRadius = 5f;
-    [SerializeField] private float visionAngle = 60f;
-    [SerializeField] private LayerMask playerMask;
-    [SerializeField] private LayerMask obstacleMask;
+    [SerializeField] private float VisionAngle = 50f;
+    [SerializeField] private float VisionDistance = 5f;
 
-    [Header("Vision Curve Settings")]
-    [SerializeField] private AnimationCurve visionFalloff;
+	private Vector2 lookDirection;
+    private Rigidbody2D rb;
+    public bool playerInSight;
+    private GameObject player;
 
-    private GridComponent grid;
-    private Transform player;
-    private MovementComponent movementComponent;
-    private List<GridTile> visibleTiles = new List<GridTile>();
-
-    private void Awake()
+    private void Start()
     {
-        grid = GridComponent.Instance;
-        movementComponent = GetComponent<MovementComponent>();
-    }
+        player = GameObject.FindGameObjectWithTag("Player");
+        rb = GetComponent<Rigidbody2D>();
+        // Register self with occupancy map component
+        OccupancyMapController.Instance?.RegisterPerciever(this, GetComponent<PathfindingComponent>());
+		// Initialize look direction to up
+		lookDirection = Vector2.up;
+	}
 
     private void Update()
     {
-        UpdatePerception();
-    }
-
-    /// <summary>
-    /// Updates perception and vision of the AI.
-    /// </summary>
-    public void UpdatePerception()
-    {
-        visibleTiles.Clear();
-        player = null; //So that the Ai doesn't keep the last seen player in memory
-
-        if (grid == null) grid = GridComponent.Instance;
-        if (grid == null)
+        // Update look direction based on movement velocity
+        if (rb.linearVelocity.magnitude > 0.1f)
         {
-            Debug.LogError("PerceptionComponent: GridComponent is null.");
-            return;
-        }
-
-        PathfindingComponent pathfinding = GetComponent<PathfindingComponent>();
-        if (pathfinding == null)
-        {
-            Debug.LogError("PerceptionComponent: PathfindingComponent missing.");
-            return;
-        }
-
-        // Get player
-        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, maxVisionRadius);
-        foreach (Collider2D hit in hits)
-        {
-            Debug.Log($"Checking collider: {hit.name}");
-            if (hit.CompareTag("Player"))
+            if (!playerInSight)
             {
-                Debug.Log("Player detected (fallback no-layer check)");
-                player = hit.transform;
-                break;
+                lookDirection = rb.linearVelocity.normalized;
+            } else
+            {
+                lookDirection = (player.transform.position - transform.position).normalized;
             }
         }
+    }
 
-        // Get visibility map
-        (GridMap visibilityMap, _) = pathfinding.Dijkstra(transform.position);
-        if (visibilityMap == null) return;
+    public bool HasLOS(GridTile tile)
+    {
+        GridComponent grid = GridComponent.Instance;
+        if (!grid) return false;
 
-        var (width, height) = grid.GetGridData().GetGridSize();
+        // if this is the tile im standing on, we also count that
+        if (grid.GetGridTileAtWorldPosition(transform.position).GridCoordinate == tile.GridCoordinate) return true;
 
-        for (int h = 0; h < height; h++)
+        // Line trace function so we don't have to raycast
+        System.Func<GridTile, GridTile, bool> LineTrace = (GridTile start, GridTile end) =>
         {
-            for (int w = 0; w < width; w++)
+            int x1 = start.GridCoordinate.x, y1 = start.GridCoordinate.y;
+            int x2 = end.GridCoordinate.x, y2 = end.GridCoordinate.y;
+
+            int dx = Mathf.Abs(x2 - x1);
+            int dy = Mathf.Abs(y2 - y1);
+            int sx = (x1 < x2) ? 1 : -1;
+            int sy = (y1 < y2) ? 1 : -1;
+
+            int err = dx - dy;
+
+            while (true)
             {
-                GridTile tile = grid.GetGridData().GetTile(w, h);
-                if (tile == null) continue;
+                GridTile currentCell = grid.GetTile(x1, y1);
 
-                float distance = visibilityMap.GetGridValue(w, h);
-                float visionStrength = visionFalloff != null ? visionFalloff.Evaluate(distance / maxVisionRadius) : 1f;
+                // Bounds check
+                if (currentCell == null) return false;
 
-                if (
-                    distance <= maxVisionRadius &&
-                    IsTileWithinFOV(tile) &&
-                    HasLineOfSight(tile)
-                )
+                // Traversability check
+                if (!currentCell.Traversable || !currentCell.EnemyTraversable) return false;
+
+                // Success condition
+                if (currentCell == end) return true;
+
+                // Move to the next cell
+                int e2 = 2 * err;
+                if (e2 > -dy)
                 {
-                    tile.Visible = true;
-                    tile.LastSeenTime = Time.time;
-                    visibleTiles.Add(tile);
+                    err -= dy;
+                    x1 += sx;
                 }
-                else
+                if (e2 < dx)
                 {
-                    tile.Visible = false;
+                    err += dx;
+                    y1 += sy;
                 }
             }
-        }
-    }
+        };
 
+        Vector2 DirectionToTarget = tile.WorldPosition - (Vector2)transform.position;
+		// Calculate the squared distance to our target. If it's greater than our vision distance
+		// then target is outside cone of vision.
+		float SquaredDistance = DirectionToTarget.sqrMagnitude;
+		if (SquaredDistance < VisionDistance * VisionDistance)
+		{
+			DirectionToTarget.Normalize();
+			float DotProduct = Vector2.Dot(lookDirection, DirectionToTarget);
+			float CosVisionAngle = Mathf.Cos((VisionAngle * 0.5f) * Mathf.Deg2Rad);
+			// We use the dot product to derive the angle between our forward vector and vector to target
+			// this will determine if target is within cone of vision.
+			if (DotProduct >= CosVisionAngle)
+			{
+                return LineTrace(grid.GetGridTileAtWorldPosition(transform.position), tile);
+			}
+		}
 
-
-    /// <summary>
-    /// Checks if a tile is within the AI's field of view.
-    /// </summary>
-    private bool IsTileWithinFOV(GridTile tile)
-    {
-        Vector2 directionToTile = (tile.WorldPosition - (Vector2)transform.position).normalized;
-
-        Vector2 facing = movementComponent != null ? movementComponent.GetCurrentVelocity().normalized : Vector2.right;
-
-        if (facing == Vector2.zero) facing = Vector2.right; // Default fallback direction
-
-        float angleToTile = Vector2.Angle(facing, directionToTile);
-        return angleToTile <= visionAngle / 2f;
-    }
-
-
-    /// <summary>
-    /// Gets all visible tiles.
-    /// </summary>
-    public List<GridTile> GetVisibleTiles()
-    {
-        return visibleTiles;
-    }
-    
-    /// <summary>
-    /// returns the Players location if it is in the line of sight of the enemy AI 
-    /// </summary>
-    public Transform GetSeenPlayer()
-    {
-        return player;
-    }
-
-    private bool HasLineOfSight(GridTile tile)
-    {
-        Vector2 start = transform.position;
-        Vector2 end = tile.WorldPosition;
-        Vector2 dir = (end - start).normalized;
-        float distance = Vector2.Distance(start, end);
-
-        RaycastHit2D[] hits = Physics2D.RaycastAll(start, dir, distance, obstacleMask);
-
-        foreach (RaycastHit2D hit in hits)
-        {
-            // If it hit something that ISN'T the player, return false
-            if (!hit.collider.CompareTag("Player"))
-            {
-                Debug.Log($"Blocked by: {hit.collider.name}");
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-
-    /// <summary>
-    /// Draws the AI's vision radius and field of view in the editor.
-    /// </summary>
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, maxVisionRadius);
-
-        Gizmos.color = Color.blue;
-        Vector3 leftSide = Quaternion.Euler(0, 0, visionAngle / 2) * transform.right * maxVisionRadius;
-        Vector3 rightSide = Quaternion.Euler(0, 0, -visionAngle / 2) * transform.right * maxVisionRadius;
-
-        Gizmos.DrawLine(transform.position, transform.position + leftSide);
-        Gizmos.DrawLine(transform.position, transform.position + rightSide);
-
-        Gizmos.color = Color.cyan;
-
-        if (movementComponent != null)
-        {
-            Vector2 facing = movementComponent.GetCurrentVelocity().normalized;
-            if (facing != Vector2.zero)
-            {
-                Gizmos.DrawLine(transform.position, transform.position + (Vector3)facing * maxVisionRadius);
-            }
-        }
-    }
+		return false;
+	}
 }
 
