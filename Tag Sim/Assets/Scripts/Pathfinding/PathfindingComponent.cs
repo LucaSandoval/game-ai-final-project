@@ -30,11 +30,6 @@ public class PathfindingComponent : MonoBehaviour
         {
             destination = GridComponent.Instance.GetTile(0, 0).WorldPosition;
         }
-        //else
-        //{
-        //    destination = GridComponent.Instance.GetTile(1, 0).WorldPosition;
-        //}
-
     }
 
     private void Update()
@@ -62,7 +57,6 @@ public class PathfindingComponent : MonoBehaviour
                 }
             }
         }
-
     }
 
     /// <summary>

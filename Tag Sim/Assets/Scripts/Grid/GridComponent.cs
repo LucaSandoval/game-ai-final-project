@@ -232,8 +232,6 @@ public class GridComponent : Singleton<GridComponent>
         }
     }
 
-
-
     private void OnDrawGizmos()
     {
         if (Application.isPlaying && mainGrid != null)
