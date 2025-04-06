@@ -30,9 +30,9 @@ public enum SpatialOp
 [System.Serializable]
 public class SpatialLayer
 {
-    [SerializeField] private SpatialInput InputType;
-    [SerializeField] private SpatialOp Operation;
-    [SerializeField] private AnimationCurve ResponseCurve;
+    [SerializeField] public SpatialInput InputType;
+    [SerializeField] public SpatialOp Operation;
+    [SerializeField] public AnimationCurve ResponseCurve;
 
     public SpatialLayer(SpatialInput inputType = SpatialInput.None, SpatialOp operation = SpatialOp.None)
     {
@@ -50,9 +50,9 @@ public class SpatialLayer
 [CreateAssetMenu(menuName = "Spatial/SpatialFunction")]
 public class SpatialFunction : ScriptableObject
 {
-    [SerializeField] private List<SpatialLayer> Layers;
-    [SerializeField] private float LastCellBonus;
-    
+    [SerializeField] public List<SpatialLayer> Layers;
+    [SerializeField] public float LastCellBonus;
+
     public SpatialFunction()
     {
         Layers = new List<SpatialLayer>();

@@ -40,11 +40,11 @@ public class PathfindingComponent : MonoBehaviour
             List<GridTile> smoothedPath = SmoothPath(astarPath);
             movementComponent.SetMovementPath(ConvertTilePathToMovementPath(smoothedPath));
 
-            if(Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButtonDown(0))
             {
                 Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                 destination = mousePos;
-             }
+            }
 
             // Player Movement
             if (isPlayer)
@@ -65,7 +65,7 @@ public class PathfindingComponent : MonoBehaviour
     public List<Vector2> ConvertTilePathToMovementPath(List<GridTile> tilePath)
     {
         List<Vector2> movementPath = new List<Vector2>();
-        foreach(GridTile tile in tilePath)
+        foreach (GridTile tile in tilePath)
         {
             movementPath.Add(tile.WorldPosition);
         }
@@ -106,7 +106,7 @@ public class PathfindingComponent : MonoBehaviour
 
                 // Bounds check
                 if (currentCell == null) return false;
-                    
+
                 // Traversability check
                 if (!currentCell.Traversable || !currentCell.EnemyTraversable) return false;
 
@@ -133,7 +133,8 @@ public class PathfindingComponent : MonoBehaviour
         if (rawPath.Count <= 2 || !LineTrace(grid.GetGridTileAtWorldPosition(transform.position), rawPath[1]))
         {
             finalPath = rawPath;
-        } else
+        }
+        else
         {
             // We iterate through each step of the path, tracing as far down the path as we can
             // get.
@@ -201,7 +202,7 @@ public class PathfindingComponent : MonoBehaviour
         PriorityQueue<GridTile> openSet = new PriorityQueue<GridTile>(compareFScore);
         openSet.Enqueue(startTile);
 
-        
+
 
         while (openSet.Count > 0)
         {
@@ -215,7 +216,7 @@ public class PathfindingComponent : MonoBehaviour
                 // Add in destination tile
                 stepsOut.Add(currentTile);
 
-                while(cameFrom.ContainsKey(currentTile))
+                while (cameFrom.ContainsKey(currentTile))
                 {
                     currentTile = cameFrom[currentTile];
                     // Add step into the path
@@ -238,7 +239,7 @@ public class PathfindingComponent : MonoBehaviour
                 grid.GetTile(currentTile.GridCoordinate.x - 1, currentTile.GridCoordinate.y + 1),
             };
 
-            foreach(GridTile neigbor in neighbors)
+            foreach (GridTile neigbor in neighbors)
             {
                 // Check if neighbor is within grid bounds
                 if (neigbor == null) continue;
@@ -350,7 +351,7 @@ public class PathfindingComponent : MonoBehaviour
         return (distanceMapOut, prev);
     }
 
-    //Using this for the AI controller to be able to set their target destination
+    // Using this for the AI controller to be able to set their target destination
     public void SetDestination(Vector2 target)
     {
         destination = target;

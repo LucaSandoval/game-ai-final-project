@@ -16,6 +16,10 @@ public class OccupancyMapController : Singleton<OccupancyMapController>
         SeedStartingSearchLocation();
     }
 
+    public GridTile GetCurrentTargetState() {
+        return lastKnownPosition;
+    }
+
     public void SeedStartingSearchLocation()
     {
         player = GameObject.FindGameObjectWithTag("Player");
