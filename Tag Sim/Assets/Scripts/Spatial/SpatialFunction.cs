@@ -47,8 +47,8 @@ public class SpatialLayer
 /// It combines various distance-related inputs, such as line-of-site, distance, or path-distance, in order 
 /// to rank the tiles of an AI agent's world perception.
 /// </summary>
-[System.Serializable]
-public class SpatialFunction
+[CreateAssetMenu(menuName = "Spatial/SpatialFunction")]
+public class SpatialFunction : ScriptableObject
 {
     [SerializeField] private List<SpatialLayer> Layers;
     [SerializeField] private float LastCellBonus;
@@ -56,5 +56,6 @@ public class SpatialFunction
     public SpatialFunction()
     {
         Layers = new List<SpatialLayer>();
+        LastCellBonus = 0f;
     }
 }
