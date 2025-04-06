@@ -22,13 +22,11 @@ public class LevelSelectOption : MonoBehaviour, IPointerClickHandler
 
     public void Highlight()
     {
-        BGImage.color = new Color(0.7012578f, 1, 0.993f);
         NameText.color = Color.white;
     }
 
     public void Unhighlight()
     {
-        BGImage.color = Color.white;
         NameText.color = Color.black;
     }
 
