@@ -30,7 +30,7 @@ public class OccupancyMapController : Singleton<OccupancyMapController>
         foreach (var perceiver in perceivers)
         {
             if (perceiver.Item1 == this) continue; // Skip self
-            float distance = Vector2.Distance(tile.WorldPosition, perceiver.Item1.transform.position);
+            float distance = grid.DistanceBetweenTiles(tile, grid.GetGridTileAtWorldPosition(perceiver.Item1.transform.position));
             if (distance < closestDistance)
             {
                 closestDistance = distance;

@@ -117,7 +117,6 @@ public class SpatialComponent : MonoBehaviour
 
         GridComponent grid = GridComponent.Instance;
         GridTile TargetPosition = OccupancyMapController.GetCurrentTargetState();
-        GridTile PredictedTile = PathfindingComponent.FindPredictedTile();
 
         (int, int) gridSize = GridMap.GetGridSize();
         for (int y = 0; y < gridSize.Item2; y++)
@@ -149,7 +148,16 @@ public class SpatialComponent : MonoBehaviour
                             }
                         case SpatialInput.PathPrediction:
                             {
-                                Value = (PredictedTile.GridCoordinate == grid.GetTile(x, y).GridCoordinate) ? 1.0f : 0.0f;
+                                GridTile PredictedTile = PathfindingComponent.FindPredictedTile();
+                                if (PredictedTile != null)
+                                {
+                                    Value = (PredictedTile.GridCoordinate == grid.GetTile(x, y).GridCoordinate) ? 1.0f : 0.0f;
+                                }
+                                else
+                                {
+                                    Value = 0.0f;
+                                }
+
                                 break;
                             }
                         case SpatialInput.None:

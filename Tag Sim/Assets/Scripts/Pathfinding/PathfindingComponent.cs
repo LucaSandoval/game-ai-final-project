@@ -22,6 +22,14 @@ public class PathfindingComponent : MonoBehaviour
         {
             playerController = GetComponent<PlayerController>();
         }
+        else
+        {
+            GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
+            if (playerObject != null)
+            {
+                playerController = playerObject.GetComponent<PlayerController>();
+            }
+        }
     }
 
     private void Start()
@@ -359,7 +367,7 @@ public class PathfindingComponent : MonoBehaviour
 
 
     /// <summary>
-    /// Calculates the tile where the player is predicted to be in 1 seocnd, assuming they continue to move at the same speed and velocity.
+    /// Calculates the tile where the player is predicted to be in .5 seconds, assuming they continue to move at the same speed and velocity.
     /// </summary>
     public GridTile FindPredictedTile()
     {
@@ -367,10 +375,9 @@ public class PathfindingComponent : MonoBehaviour
         Vector2 playerPosition = playerController.getDestination();
         Vector2 playerVelocity = playerController.GetComponent<Rigidbody2D>().linearVelocity;
 
-        // Predict the position after 1 second
-        Vector2 predictedPosition = playerPosition + playerVelocity;
+        Vector2 predictedPosition = playerPosition + playerVelocity * .5f;
 
         GridTile predictedTile = grid.GetGridTileAtWorldPosition(predictedPosition);
-        return predictedTile;
+        return predictedTile; // Returns the predicted tile if found, otherwise null
     }
 }

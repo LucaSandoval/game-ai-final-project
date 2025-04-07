@@ -118,7 +118,7 @@ public class PlayerController : MonoBehaviour
 
         // Get the target tile and return its world position
         GridTile targetTile = gridComponent.GetTile(targetCoord.x, targetCoord.y);
-        if (targetTile.Traversable && targetTile != null)
+        if (targetTile != null && targetTile.Traversable)
         {
             return targetTile.WorldPosition;
         }
@@ -126,6 +126,6 @@ public class PlayerController : MonoBehaviour
         {
             return transform.position;
         }
-            
+
     }
 }
