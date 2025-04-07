@@ -98,21 +98,16 @@ public class PlayerController : MonoBehaviour
         // Get the tile at the player's position
         TileBase tile = goalTilemap.GetTile(tilePosition);
 
-        // Check if the tile is named "Goal"
         if (tile != null && tile.name == "Goal")
         {
-            // Increment the score and log it
             score++;
             Debug.Log($"Score: {score}");
-
-            // Reset the current tile to BaseTile
             goalTilemap.SetTile(tilePosition, BaseTile);
-
-            // Choose a new random GoalTile at least 10 tiles away
             SetNewGoalTile(tilePosition);
         }
     }
 
+    // Once the player has stepped on a goal tile, generate a new random one 10 tiles away
     private void SetNewGoalTile(Vector3Int currentTilePosition)
     {
         if (goalTilemap == null) return;
@@ -127,8 +122,6 @@ public class PlayerController : MonoBehaviour
             int randomY = Random.Range(goalTilemap.origin.y, goalTilemap.origin.y + gridSize.y);
             newGoalPosition = new Vector3Int(randomX, randomY, currentTilePosition.z);
 
-            // Ensure the new position is at least 10 tiles away from the current position
-            // and that the tile at the new position is a BaseTile
         } while (Vector3Int.Distance(newGoalPosition, currentTilePosition) < 10 || 
                  goalTilemap.GetTile(newGoalPosition) != BaseTile);
 
