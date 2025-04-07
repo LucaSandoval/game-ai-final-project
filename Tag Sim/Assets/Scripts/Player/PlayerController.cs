@@ -1,10 +1,10 @@
 using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.Tilemaps;
 using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
-
     private GridComponent gridComponent;
     private MovementComponent movementComponent;
 
@@ -24,8 +24,12 @@ public class PlayerController : MonoBehaviour
     public Image staminaBar;
     public CanvasGroup staminaCanvasGroup;
 
-
     private Vector2 lastPosition; // Track the last position for movement check
+
+    private int score = 0; 
+    public Tilemap goalTilemap; 
+    public Tile BaseTile;
+    public Tile GoalTile;
 
     private void Awake()
     {
@@ -47,6 +51,7 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         HandleStamina();
+        CheckGoalTile(); // Check if the player is on a "Goal" tile
     }
 
     // Handle the stamina of the player when sprinting
@@ -82,6 +87,54 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    // Check if the player is on a "Goal" tile and increment the score
+    private void CheckGoalTile()
+    {
+        if (goalTilemap == null) return;
+
+        // Get the player's current position in the tilemap's grid
+        Vector3Int tilePosition = goalTilemap.WorldToCell(transform.position);
+
+        // Get the tile at the player's position
+        TileBase tile = goalTilemap.GetTile(tilePosition);
+
+        // Check if the tile is named "Goal"
+        if (tile != null && tile.name == "Goal")
+        {
+            // Increment the score and log it
+            score++;
+            Debug.Log($"Score: {score}");
+
+            // Reset the current tile to BaseTile
+            goalTilemap.SetTile(tilePosition, BaseTile);
+
+            // Choose a new random GoalTile at least 10 tiles away
+            SetNewGoalTile(tilePosition);
+        }
+    }
+
+    private void SetNewGoalTile(Vector3Int currentTilePosition)
+    {
+        if (goalTilemap == null) return;
+
+        Vector3Int gridSize = goalTilemap.size;
+        Vector3Int newGoalPosition;
+
+        do
+        {
+            // Generate a random position within the bounds of the tilemap
+            int randomX = Random.Range(goalTilemap.origin.x, goalTilemap.origin.x + gridSize.x);
+            int randomY = Random.Range(goalTilemap.origin.y, goalTilemap.origin.y + gridSize.y);
+            newGoalPosition = new Vector3Int(randomX, randomY, currentTilePosition.z);
+
+            // Ensure the new position is at least 10 tiles away from the current position
+            // and that the tile at the new position is a BaseTile
+        } while (Vector3Int.Distance(newGoalPosition, currentTilePosition) < 10 || 
+                 goalTilemap.GetTile(newGoalPosition) != BaseTile);
+
+        // Set the new GoalTile
+        goalTilemap.SetTile(newGoalPosition, GoalTile);
+    }
 
     // Get the destination of the player based on the key pressed
     public Vector2 getDestination()
@@ -126,6 +179,5 @@ public class PlayerController : MonoBehaviour
         {
             return transform.position;
         }
-
     }
 }

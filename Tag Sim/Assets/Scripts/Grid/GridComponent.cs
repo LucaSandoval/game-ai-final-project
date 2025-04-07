@@ -15,7 +15,7 @@ public class GridComponent : Singleton<GridComponent>
     [SerializeField] private bool DebugDisplayTileValues;
     [SerializeField] private MapController MapController;
 
-    private Tilemap tilemap;
+    public Tilemap tilemap;
     private GridMap mainGrid;
     private Vector2 gridTopLeft, gridBottomRight;
     private int Width, Height;
