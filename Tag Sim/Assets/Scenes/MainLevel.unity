@@ -786,6 +786,7 @@ MonoBehaviour:
   SpatialFunction: {fileID: 11400000, guid: 6cc489bca725e4008849b71d611e76de, type: 2}
   PathfindToPositionToggle: 1
   DebugToggle: 1
+  SearchWorstTile: 0
 --- !u!4 &302044504 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6503444505702742961, guid: 50cd81df3c42fc94e93c4a026e855f5a, type: 3}
@@ -1668,6 +1669,7 @@ MonoBehaviour:
   SpatialFunction: {fileID: 11400000, guid: cc66947ca54a24c7da664ec443330fa0, type: 2}
   PathfindToPositionToggle: 1
   DebugToggle: 1
+  SearchWorstTile: 0
 --- !u!1001 &1175093178
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8279,6 +8281,18 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 2323917800338813707, guid: a0c9924df9a034f429c0d1de6322edfe, type: 3}
+    - target: {fileID: 8899176828367025071, guid: 7a39e0fcf19c7c942a6a5fb300762644, type: 3}
+      propertyPath: m_Color.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8899176828367025071, guid: 7a39e0fcf19c7c942a6a5fb300762644, type: 3}
+      propertyPath: m_Color.g
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8899176828367025071, guid: 7a39e0fcf19c7c942a6a5fb300762644, type: 3}
+      propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -8498,6 +8512,7 @@ MonoBehaviour:
   SpatialFunction: {fileID: 11400000, guid: cc66947ca54a24c7da664ec443330fa0, type: 2}
   PathfindToPositionToggle: 1
   DebugToggle: 1
+  SearchWorstTile: 1
 --- !u!1001 &1995976400
 PrefabInstance:
   m_ObjectHideFlags: 0

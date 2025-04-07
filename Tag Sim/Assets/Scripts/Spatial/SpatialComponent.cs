@@ -13,10 +13,10 @@ public class SpatialComponent : MonoBehaviour
     [Header("Spatial Function Settings")]
     [SerializeField] private SpatialFunction SpatialFunction;
 
-
     [Header("Spatial Component Settings")]
     [SerializeField] private bool PathfindToPositionToggle;
     [SerializeField] private bool DebugToggle;
+    [SerializeField] private bool SearchWorstTile; 
 
     private void Awake()
     {
@@ -61,8 +61,8 @@ public class SpatialComponent : MonoBehaviour
             EvaluateLayer(Layer, DistanceMap, GridMap);
         }
 
-        // Step 3 - Pick the best cell in GridMap
-        float BestScore = float.MinValue;
+        // Step 3 - Pick the best or worst cell in GridMap 
+        float TargetScore = SearchWorstTile ? float.MaxValue : float.MinValue;
         (int, int) gridSize = GridMap.GetGridSize();
         for (int y = 0; y < gridSize.Item2; y++)
         {
@@ -73,9 +73,13 @@ public class SpatialComponent : MonoBehaviour
                 if (CurrentDistance < float.MaxValue)
                 {
                     float CurrentScore = GridMap.GetGridValue(x, y);
-                    if (CurrentScore > BestScore)
+
+                    // Found a better score! 
+                    // If searching for the worst tile, better score is lower but not 0
+                    if ((SearchWorstTile && CurrentScore < TargetScore && CurrentScore > 0) || 
+                        (!SearchWorstTile && CurrentScore > TargetScore))
                     {
-                        BestScore = CurrentScore;
+                        TargetScore = CurrentScore;
                         BestCell = grid.GetTile(x, y);
                         Result = true;
                     }
@@ -83,14 +87,14 @@ public class SpatialComponent : MonoBehaviour
             }
         }
 
-        // Step 4 - If we are pathfinding, set the movement path to the best cell
+        // Step 4 - If we are pathfinding, set the movement path to the best or worst cell
         if (PathfindToPositionToggle)
         {
             if (BestCell != null)
             {
                 if (DebugToggle)
                 {
-                    Debug.DrawLine(transform.position, BestCell.WorldPosition, Color.red);
+                    Debug.DrawLine(transform.position, BestCell.WorldPosition, SearchWorstTile ? Color.blue : Color.red);
                 }
                 PathfindingComponent.SetDestination(BestCell.WorldPosition);
             }

@@ -46,6 +46,8 @@ public class MovementComponent : MonoBehaviour
                 Vector2 dir = (movementPath[0] - (Vector2)transform.position).normalized;
                 rb.linearVelocity = dir * MovementSpeed;
                 moving = true;
+
+                
             }
 
         } else
