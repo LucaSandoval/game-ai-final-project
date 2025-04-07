@@ -257,5 +257,13 @@ public class GridComponent : Singleton<GridComponent>
         }
     }
 
+    public Tilemap GetTilemap()
+    {
+        return tilemap;
+    }
 
+    public GridMap GetGridMap()
+    {
+        return mainGrid;
+    }
 }

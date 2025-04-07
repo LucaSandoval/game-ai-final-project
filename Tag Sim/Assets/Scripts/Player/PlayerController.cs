@@ -27,14 +27,21 @@ public class PlayerController : MonoBehaviour
     private Vector2 lastPosition; // Track the last position for movement check
 
     private int score = 0; 
-    public Tilemap goalTilemap; 
+    private Tilemap goalTilemap; 
     public Tile BaseTile;
     public Tile GoalTile;
 
     private void Awake()
     {
+
+    }
+
+    private void Start()
+    {
         gridComponent = GridComponent.Instance;
         movementComponent = GetComponent<MovementComponent>();
+
+        goalTilemap = gridComponent.GetTilemap(); 
 
         originalSpeed = movementComponent.GetSpeed();
         sprintSpeed = originalSpeed * 2;

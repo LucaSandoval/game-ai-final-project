@@ -1,4 +1,6 @@
 using UnityEngine;
+using System.Collections.Generic;
+using UnityEngine.Tilemaps;
 
 /// <summary>
 /// Component responsible for helping our agents make decisions about where to move in the world.
@@ -17,6 +19,10 @@ public class SpatialComponent : MonoBehaviour
     [SerializeField] private bool PathfindToPositionToggle;
     [SerializeField] private bool DebugToggle;
     [SerializeField] private bool SearchWorstTile; 
+    private List<GameObject> enemies;
+    private Tilemap tilemap;
+    private GridMap gridMap;
+    private GridComponent grid;
 
     private void Awake()
     {
@@ -24,13 +30,30 @@ public class SpatialComponent : MonoBehaviour
         PathfindingComponent = GetComponent<PathfindingComponent>();
     }
 
+    private void Start()
+    {
+        enemies = new List<GameObject>(GameObject.FindGameObjectsWithTag("Enemy"));
+        grid = GridComponent.Instance;
+        tilemap = grid.GetTilemap();
+        gridMap = grid.GetGridMap();
+    }
+
     public void Update()
     {
         ChoosePosition();
     }
 
+    private void ResetClaimed() 
+    {
+        foreach (GridTile tile in gridMap.GetTiles())
+        {
+            tile.IsClaimed = false;
+        }
+    }
+
     public bool ChoosePosition()
     {
+        //Debug.Log("I am enemy of index " + enemies.IndexOf(gameObject) + " and I am choosing a position.");
         GridComponent grid = GridComponent.Instance;
         bool Result = false;
 
@@ -81,6 +104,7 @@ public class SpatialComponent : MonoBehaviour
                     {
                         TargetScore = CurrentScore;
                         BestCell = grid.GetTile(x, y);
+                        BestCell.IsClaimed = true;
                         Result = true;
                     }
                 }
@@ -98,6 +122,11 @@ public class SpatialComponent : MonoBehaviour
                 }
                 PathfindingComponent.SetDestination(BestCell.WorldPosition);
             }
+        }
+
+        if(enemies.IndexOf(gameObject) == enemies.Count - 1)
+        {
+            ResetClaimed();
         }
 
         return Result;

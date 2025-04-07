@@ -162,4 +162,9 @@ public class GridMap
             }
         }
     }
+
+    public GridTile[,] GetTiles()
+    {
+        return tiles;
+    }
 }

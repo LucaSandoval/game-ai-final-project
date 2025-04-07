@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 public class LevelManager : MonoBehaviour
 {
@@ -12,6 +13,9 @@ public class LevelManager : MonoBehaviour
     private GameObject player;
     private bool isGameOver = false;
     //private bool isGamePaused = false;
+    private GridComponent grid;
+    private Tilemap tilemap;
+    private GridMap gridMap;
 
     private void Awake()
     {
@@ -30,6 +34,9 @@ public class LevelManager : MonoBehaviour
     {
         enemies = new List<GameObject>(GameObject.FindGameObjectsWithTag("Enemy"));
         player = GameObject.FindGameObjectWithTag("Player");
+        grid = GridComponent.Instance;
+        tilemap = grid.GetTilemap();
+        gridMap = grid.GetGridMap();
     }
 
     // Update is called once per frame
@@ -39,13 +46,13 @@ public class LevelManager : MonoBehaviour
         {
             CheckForCollision();
         }
+
     }
 
     private void CheckForCollision()
     {
         if (player == null) return;
 
-        GridComponent grid = GridComponent.Instance;
         GridTile playerTile = grid.GetGridTileAtWorldPosition(player.transform.position);
 
         foreach (GameObject enemy in enemies)
@@ -62,6 +69,24 @@ public class LevelManager : MonoBehaviour
                 // functions for when game ends go here bro
                 break;
             }
+        }
+    }
+
+    private void SetEnemyOccupancy() 
+    {
+        foreach (GameObject enemy in enemies)
+        {
+            if (enemy == null) continue;
+            GridTile enemyTile = grid.GetGridTileAtWorldPosition(enemy.transform.position);
+            enemyTile.Occupied = true;
+        }
+    }
+
+    private void ResetOccupancy() 
+    {
+        foreach (GridTile tile in gridMap.GetTiles())
+        {
+            tile.Occupied = false;
         }
     }
 }

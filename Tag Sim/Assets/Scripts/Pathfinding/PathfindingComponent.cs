@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System;
+using UnityEngine.Tilemaps;
 
 /// <summary>
 /// Component responsible for all things related to pathfinding an entity, providing AStar, Smoothing,
@@ -13,6 +14,10 @@ public class PathfindingComponent : MonoBehaviour
 
     [SerializeField] private bool isPlayer = false;
     private PlayerController playerController;
+    private List<GameObject> enemies;
+    private Tilemap tilemap;
+    private GridMap gridMap;
+    private GridComponent grid;
 
     private void Awake()
     {
@@ -34,6 +39,10 @@ public class PathfindingComponent : MonoBehaviour
 
     private void Start()
     {
+        enemies = new List<GameObject>(GameObject.FindGameObjectsWithTag("Enemy"));
+        grid = GridComponent.Instance;
+        tilemap = grid.GetTilemap();
+        gridMap = grid.GetGridMap();
         if (isPlayer == false)
         {
             destination = GridComponent.Instance.GetTile(0, 0).WorldPosition;
@@ -172,12 +181,33 @@ public class PathfindingComponent : MonoBehaviour
         return finalPath;
     }
 
+    private void SetEnemyOccupancy() 
+    {
+        foreach (GameObject enemy in enemies)
+        {
+            if (enemy == null) continue;
+            GridTile enemyTile = grid.GetGridTileAtWorldPosition(enemy.transform.position);
+            enemyTile.Occupied = true;
+            //Debug.Log("Enemy tile occupied: " + enemyTile.Occupied + " at " + enemyTile.GridCoordinate);
+        }
+    }
+
+    private void ResetOccupancy() 
+    {
+        foreach (GridTile tile in gridMap.GetTiles())
+        {
+            tile.Occupied = false;
+        }
+    }
+
     /// <summary>
     /// Performs an AStar search from the start to the end position. Returns a list of tiles
     /// representing the path from the start to the end.
     /// </summary>
     public List<GridTile> AStar(Vector2 startPosition, Vector2 targetPosition)
     {
+        ResetOccupancy();
+        SetEnemyOccupancy();
         GridComponent grid = GridComponent.Instance;
         if (!grid)
         {
@@ -252,7 +282,7 @@ public class PathfindingComponent : MonoBehaviour
                 // Check if neighbor is within grid bounds
                 if (neigbor == null) continue;
                 // Check if this neighbor is inaccessible
-                if (!neigbor.Traversable || (!neigbor.EnemyTraversable && !isPlayer)) continue;
+                if (!neigbor.Traversable || (!neigbor.EnemyTraversable && !isPlayer) || (neigbor.Occupied && !isPlayer)) continue;
 
                 if (!neigbor.PlayerTraversable && isPlayer)
                 {
@@ -339,7 +369,7 @@ public class PathfindingComponent : MonoBehaviour
                 // Check if neighbor is within grid bounds
                 if (neighbor == null) continue;
                 // Check if this neighbor is inaccessible
-                if (!neighbor.Traversable || (!neighbor.EnemyTraversable && !isPlayer)) continue;
+                if (!neighbor.Traversable || (!neighbor.EnemyTraversable && !isPlayer) || (neighbor.Occupied && !isPlayer)) continue;
 
                 // Check if the dist[CurrentCell] + distance from CurrentCell to Neighbor
                 // is less than dist[Neighbor].
