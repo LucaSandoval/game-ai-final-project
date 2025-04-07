@@ -60,7 +60,6 @@ public class LevelManager : MonoBehaviour
                 isGameOver = true;
                 Debug.Log("Game Over! The player was caught.");
                 // functions for when game ends go here bro
-
                 break;
             }
         }

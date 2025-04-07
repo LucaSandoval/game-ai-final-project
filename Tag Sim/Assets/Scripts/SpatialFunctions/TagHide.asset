@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fcaacf2311809497aa7094d4c7f7b2b8, type: 3}
-  m_Name: TagHold
+  m_Name: TagHide
   m_EditorClassIdentifier: 
   Layers:
   - InputType: 1
@@ -19,59 +19,59 @@ MonoBehaviour:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
-        time: -0.0029182676
-        value: 20
-        inSlope: -0.39997664
-        outSlope: -0.39997664
-        tangentMode: 34
+        time: 0.074002236
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
         weightedMode: 0
-        inWeight: 0
+        inWeight: 0.33333334
         outWeight: 0.33333334
       - serializedVersion: 3
-        time: 50
-        value: 0
-        inSlope: -0.29962802
-        outSlope: -0.29962802
-        tangentMode: 0
+        time: 6
+        value: 20
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
         weightedMode: 0
-        inWeight: 0.6814573
-        outWeight: 0
-      m_PreInfinity: 2
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 20
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      m_PreInfinity: 0
       m_PostInfinity: 0
       m_RotationOrder: 4
-  - InputType: 0
+  - InputType: 2
     Operation: 1
     ResponseCurve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 1
+        value: 20
         inSlope: 0
         outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 5.018881
-        value: 10.9918585
-        inSlope: -0.03745063
-        outSlope: -0.03745063
-        tangentMode: 0
+        tangentMode: 136
         weightedMode: 0
         inWeight: 0.33333334
         outWeight: 0.33333334
       - serializedVersion: 3
-        time: 40
+        time: 1
         value: 0
         inSlope: 0
         outSlope: 0
-        tangentMode: 0
+        tangentMode: 136
         weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      m_PreInfinity: 0
+      m_PostInfinity: 0
       m_RotationOrder: 4
-  LastCellBonus: 20
+  LastCellBonus: 0

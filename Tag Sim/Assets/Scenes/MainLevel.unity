@@ -779,9 +779,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b52b398db9ee54b6c8adf91b04d59580, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SpatialFunction: {fileID: 11400000, guid: cc66947ca54a24c7da664ec443330fa0, type: 2}
+  SpatialFunction: {fileID: 11400000, guid: 6cc489bca725e4008849b71d611e76de, type: 2}
   PathfindToPositionToggle: 1
-  DebugToggle: 0
+  DebugToggle: 1
 --- !u!4 &302044504 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6503444505702742961, guid: 50cd81df3c42fc94e93c4a026e855f5a, type: 3}
@@ -1630,13 +1630,36 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 598890878101453146, guid: 7a39e0fcf19c7c942a6a5fb300762644, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1161886203}
   m_SourcePrefab: {fileID: 100100000, guid: 7a39e0fcf19c7c942a6a5fb300762644, type: 3}
 --- !u!4 &1161886201 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3979155484073194735, guid: 7a39e0fcf19c7c942a6a5fb300762644, type: 3}
   m_PrefabInstance: {fileID: 1161886200}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1161886202 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 598890878101453146, guid: 7a39e0fcf19c7c942a6a5fb300762644, type: 3}
+  m_PrefabInstance: {fileID: 1161886200}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1161886203
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1161886202}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b52b398db9ee54b6c8adf91b04d59580, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SpatialFunction: {fileID: 11400000, guid: cc66947ca54a24c7da664ec443330fa0, type: 2}
+  PathfindToPositionToggle: 1
+  DebugToggle: 1
 --- !u!1001 &1175093178
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8462,7 +8485,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SpatialFunction: {fileID: 11400000, guid: cc66947ca54a24c7da664ec443330fa0, type: 2}
   PathfindToPositionToggle: 1
-  DebugToggle: 0
+  DebugToggle: 1
 --- !u!1001 &1995976400
 PrefabInstance:
   m_ObjectHideFlags: 0

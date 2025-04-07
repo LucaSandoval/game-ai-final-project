@@ -10,6 +10,8 @@ public enum SpatialInput
     TargetRange,
     PathDistance,
     LoS,
+    AgentDistance,
+    PathPrediction,
     None
 }
 

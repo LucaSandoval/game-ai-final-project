@@ -11,6 +11,7 @@ public class PerceptionComponent : MonoBehaviour
     public bool playerInSight;
     private GameObject player;
 
+
     private void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player");
@@ -37,6 +38,9 @@ public class PerceptionComponent : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Checks if the given tile is within the perceiver's line of sight.
+    /// </summary>
     public bool HasLOS(GridTile tile)
     {
         GridComponent grid = GridComponent.Instance;
@@ -94,7 +98,7 @@ public class PerceptionComponent : MonoBehaviour
         {
             DirectionToTarget.Normalize();
             float DotProduct = Vector2.Dot(lookDirection, DirectionToTarget);
-            float CosVisionAngle = Mathf.Cos((VisionAngle * 0.5f) * Mathf.Deg2Rad);
+            float CosVisionAngle = Mathf.Cos(VisionAngle * 0.5f * Mathf.Deg2Rad);
             // We use the dot product to derive the angle between our forward vector and vector to target
             // this will determine if target is within cone of vision.
             if (DotProduct >= CosVisionAngle)

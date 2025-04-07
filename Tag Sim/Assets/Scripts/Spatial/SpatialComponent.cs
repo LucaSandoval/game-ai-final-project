@@ -1,8 +1,4 @@
 using UnityEngine;
-using System.Collections.Generic;
-using System;
-using Unity.VisualScripting;
-using UnityEngine.SocialPlatforms.Impl;
 
 /// <summary>
 /// Component responsible for helping our agents make decisions about where to move in the world.
@@ -11,7 +7,6 @@ public class SpatialComponent : MonoBehaviour
 {
     private MovementComponent MovementComponent;
     private PathfindingComponent PathfindingComponent;
-    private OccupancyMapController OccupancyMapController;
 
     private GridTile BestCell;
 
@@ -23,46 +18,24 @@ public class SpatialComponent : MonoBehaviour
     [SerializeField] private bool PathfindToPositionToggle;
     [SerializeField] private bool DebugToggle;
 
-
-    private void Start()
+    private void Awake()
     {
         MovementComponent = GetComponent<MovementComponent>();
-        if (MovementComponent == null)
-        {
-            Debug.LogError("SpatialComponent: MovementComponent is not assigned.");
-        }
-
         PathfindingComponent = GetComponent<PathfindingComponent>();
-        if (PathfindingComponent == null)
-        {
-            Debug.LogError("SpatialComponent: PathfindingComponent is not assigned.");
-        }
-
-        OccupancyMapController = OccupancyMapController.Instance;
-        if (OccupancyMapController == null)
-        {
-            Debug.LogError("SpatialComponent: OccupancyMapController is not assigned.");
-        }
-
-        if (SpatialFunction == null)
-        {
-            Debug.LogError("SpatialComponent: SpatialFunction is not assigned.");
-        }
     }
 
-    private void Update()
+    public void Update()
     {
-        ChoosePosition(PathfindToPositionToggle, DebugToggle);
+        ChoosePosition();
     }
 
-    public bool ChoosePosition(bool PathfindToPosition, bool Debug)
+    public bool ChoosePosition()
     {
+        GridComponent grid = GridComponent.Instance;
         bool Result = false;
 
         GridTile LastCell = BestCell;
         BestCell = null;
-
-        GridComponent grid = GridComponent.Instance;
 
         if (grid == null || PathfindingComponent == null || SpatialFunction == null)
         {
@@ -77,7 +50,10 @@ public class SpatialComponent : MonoBehaviour
         GridMap DistanceMap = PathfindingComponent.Dijkstra(StartLoc).Item1;
 
         // Give the last cell a bonus
-        GridMap.SetGridValue(LastCell.GridCoordinate.x, LastCell.GridCoordinate.y, SpatialFunction.LastCellBonus);
+        if (LastCell != null)
+        {
+            GridMap.SetGridValue(LastCell.GridCoordinate.x, LastCell.GridCoordinate.y, SpatialFunction.LastCellBonus);
+        }
 
         // Step 2 - For each layer in our spatial function, evaluate and accumulate the layer in GridMap
         foreach (SpatialLayer Layer in SpatialFunction.Layers)
@@ -100,7 +76,7 @@ public class SpatialComponent : MonoBehaviour
                     if (CurrentScore > BestScore)
                     {
                         BestScore = CurrentScore;
-                        BestCell = GridMap.GetTile(x, y);
+                        BestCell = grid.GetTile(x, y);
                         Result = true;
                     }
                 }
@@ -108,10 +84,14 @@ public class SpatialComponent : MonoBehaviour
         }
 
         // Step 4 - If we are pathfinding, set the movement path to the best cell
-        if (PathfindToPosition)
+        if (PathfindToPositionToggle)
         {
             if (BestCell != null)
             {
+                if (DebugToggle)
+                {
+                    Debug.DrawLine(transform.position, BestCell.WorldPosition, Color.red);
+                }
                 PathfindingComponent.SetDestination(BestCell.WorldPosition);
             }
         }
@@ -128,7 +108,16 @@ public class SpatialComponent : MonoBehaviour
             return;
         }
 
+        OccupancyMapController OccupancyMapController = OccupancyMapController.Instance;
+        if (OccupancyMapController == null)
+        {
+            Debug.LogError("SpatialComponent: OccupancyMapController is not assigned.");
+            return;
+        }
+
+        GridComponent grid = GridComponent.Instance;
         GridTile TargetPosition = OccupancyMapController.GetCurrentTargetState();
+        GridTile PredictedTile = PathfindingComponent.FindPredictedTile();
 
         (int, int) gridSize = GridMap.GetGridSize();
         for (int y = 0; y < gridSize.Item2; y++)
@@ -143,14 +132,24 @@ public class SpatialComponent : MonoBehaviour
                     switch (Layer.InputType)
                     {
                         case SpatialInput.TargetRange:
-                            Value = Vector2.Distance(TargetPosition.WorldPosition, GridMap.GetTile(x, y).WorldPosition);
+                            Value = Vector2.Distance(TargetPosition.WorldPosition, grid.GetTile(x, y).WorldPosition);
                             break;
                         case SpatialInput.PathDistance:
                             Value = CellDistance;
                             break;
                         case SpatialInput.LoS:
                             {
-                                Value = PerceptionComponent.HasLOS(GridMap.GetTile(x, y)) ? 1.0f : 0.0f;
+                                Value = PerceptionComponent.HasLOS(grid.GetTile(x, y)) ? 1.0f : 0.0f;
+                                break;
+                            }
+                        case SpatialInput.AgentDistance:
+                            {
+                                Value = OccupancyMapController.GetDistanceToClosestPerceiver(grid.GetTile(x, y));
+                                break;
+                            }
+                        case SpatialInput.PathPrediction:
+                            {
+                                Value = (PredictedTile.GridCoordinate == grid.GetTile(x, y).GridCoordinate) ? 1.0f : 0.0f;
                                 break;
                             }
                         case SpatialInput.None:
@@ -159,7 +158,7 @@ public class SpatialComponent : MonoBehaviour
 
                     // Apply the response curve to the value
                     float ModifiedValue = Layer.ResponseCurve.Evaluate(Value);
-                    float CurrentValue = 0.0f;
+                    float CurrentValue = GridMap.GetGridValue(x, y);
                     float ResultValue = 0.0f;
 
                     switch (Layer.Operation)
