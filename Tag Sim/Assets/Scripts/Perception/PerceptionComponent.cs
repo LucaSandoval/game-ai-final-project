@@ -1,6 +1,4 @@
 using UnityEngine;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 
 public class PerceptionComponent : MonoBehaviour
 {
@@ -8,20 +6,21 @@ public class PerceptionComponent : MonoBehaviour
     [SerializeField] private float VisionAngle = 50f;
     [SerializeField] private float VisionDistance = 5f;
 
-	private Vector2 lookDirection;
+    private Vector2 lookDirection;
     private Rigidbody2D rb;
     public bool playerInSight;
     private GameObject player;
+
 
     private void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player");
         rb = GetComponent<Rigidbody2D>();
         // Register self with occupancy map component
-        OccupancyMapController.Instance?.RegisterPerciever(this, GetComponent<PathfindingComponent>());
-		// Initialize look direction to up
-		lookDirection = Vector2.up;
-	}
+        OccupancyMapController.Instance?.RegisterPerceiver(this, GetComponent<PathfindingComponent>());
+        // Initialize look direction to up
+        lookDirection = Vector2.up;
+    }
 
     private void Update()
     {
@@ -31,13 +30,17 @@ public class PerceptionComponent : MonoBehaviour
             if (!playerInSight)
             {
                 lookDirection = rb.linearVelocity.normalized;
-            } else
+            }
+            else
             {
                 lookDirection = (player.transform.position - transform.position).normalized;
             }
         }
     }
 
+    /// <summary>
+    /// Checks if the given tile is within the perceiver's line of sight.
+    /// </summary>
     public bool HasLOS(GridTile tile)
     {
         GridComponent grid = GridComponent.Instance;
@@ -88,23 +91,23 @@ public class PerceptionComponent : MonoBehaviour
         };
 
         Vector2 DirectionToTarget = tile.WorldPosition - (Vector2)transform.position;
-		// Calculate the squared distance to our target. If it's greater than our vision distance
-		// then target is outside cone of vision.
-		float SquaredDistance = DirectionToTarget.sqrMagnitude;
-		if (SquaredDistance < VisionDistance * VisionDistance)
-		{
-			DirectionToTarget.Normalize();
-			float DotProduct = Vector2.Dot(lookDirection, DirectionToTarget);
-			float CosVisionAngle = Mathf.Cos((VisionAngle * 0.5f) * Mathf.Deg2Rad);
-			// We use the dot product to derive the angle between our forward vector and vector to target
-			// this will determine if target is within cone of vision.
-			if (DotProduct >= CosVisionAngle)
-			{
+        // Calculate the squared distance to our target. If it's greater than our vision distance
+        // then target is outside cone of vision.
+        float SquaredDistance = DirectionToTarget.sqrMagnitude;
+        if (SquaredDistance < VisionDistance * VisionDistance)
+        {
+            DirectionToTarget.Normalize();
+            float DotProduct = Vector2.Dot(lookDirection, DirectionToTarget);
+            float CosVisionAngle = Mathf.Cos(VisionAngle * 0.5f * Mathf.Deg2Rad);
+            // We use the dot product to derive the angle between our forward vector and vector to target
+            // this will determine if target is within cone of vision.
+            if (DotProduct >= CosVisionAngle)
+            {
                 return LineTrace(grid.GetGridTileAtWorldPosition(transform.position), tile);
-			}
-		}
+            }
+        }
 
-		return false;
-	}
+        return false;
+    }
 }
 

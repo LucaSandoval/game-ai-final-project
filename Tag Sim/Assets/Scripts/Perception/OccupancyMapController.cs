@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 public class OccupancyMapController : Singleton<OccupancyMapController>
 {
-    private List<(PerceptionComponent, PathfindingComponent)> percievers;
+    private List<(PerceptionComponent, PathfindingComponent)> perceivers;
 
     private GridMap occupancyMap;
     private GameObject player;
@@ -14,6 +14,29 @@ public class OccupancyMapController : Singleton<OccupancyMapController>
     private void Start()
     {
         SeedStartingSearchLocation();
+    }
+
+    public GridTile GetCurrentTargetState()
+    {
+        return lastKnownPosition;
+    }
+
+    /// </summary>
+    /// Find the closest perceiver to the given tile, not including the tile itself.
+    /// </summary>
+    public float GetDistanceToClosestPerceiver(GridTile tile)
+    {
+        float closestDistance = float.MaxValue;
+        foreach (var perceiver in perceivers)
+        {
+            if (perceiver.Item1 == this) continue; // Skip self
+            float distance = grid.DistanceBetweenTiles(tile, grid.GetGridTileAtWorldPosition(perceiver.Item1.transform.position));
+            if (distance < closestDistance)
+            {
+                closestDistance = distance;
+            }
+        }
+        return closestDistance;
     }
 
     public void SeedStartingSearchLocation()
@@ -28,12 +51,12 @@ public class OccupancyMapController : Singleton<OccupancyMapController>
     }
 
     /// <summary>
-    /// Registers a 'perciever' enemy with this component for coordination and sharing of occupancy map.
+    /// Registers a 'perceiver' enemy with this component for coordination and sharing of occupancy map.
     /// </summary>
-    public void RegisterPerciever(PerceptionComponent perceptionComponent, PathfindingComponent pathfindingComponent)
+    public void RegisterPerceiver(PerceptionComponent perceptionComponent, PathfindingComponent pathfindingComponent)
     {
-        if (percievers == null) percievers = new List<(PerceptionComponent, PathfindingComponent)>();
-        percievers.Add((perceptionComponent, pathfindingComponent));
+        if (perceivers == null) perceivers = new List<(PerceptionComponent, PathfindingComponent)>();
+        perceivers.Add((perceptionComponent, pathfindingComponent));
     }
 
     /// <summary>
@@ -81,11 +104,11 @@ public class OccupancyMapController : Singleton<OccupancyMapController>
                 // Only evaluate valid and traversable tiles.
                 if (occupancyMap.GetTile(x, y) != null && occupancyMap.GetTile(x, y).Traversable)
                 {
-                    foreach(var perciever in percievers)
+                    foreach (var perceiver in perceivers)
                     {
                         // Since we know at this point none of our visible cells contain the player,
                         // we can safely elimanate all possibility from this tile.
-                        if (perciever.Item1.HasLOS(occupancyMap.GetTile(x, y)))
+                        if (perceiver.Item1.HasLOS(occupancyMap.GetTile(x, y)))
                         {
                             occupancyMap.SetGridValue(x, y, 0);
                             break;
@@ -170,12 +193,12 @@ public class OccupancyMapController : Singleton<OccupancyMapController>
 
                 // Spread probability among valid neighbors, accounting for diagonals
                 float remainingProbability = currentProbability;
-                foreach(var neighborPair in validNeighbors)
+                foreach (var neighborPair in validNeighbors)
                 {
                     float transferAmount = (currentProbability * neighborPair.Item2) / totalWeight;
                     remainingProbability -= transferAmount;
 
-                    Q.SetGridValue(neighborPair.Item1.GridCoordinate.x, neighborPair.Item1.GridCoordinate.y, 
+                    Q.SetGridValue(neighborPair.Item1.GridCoordinate.x, neighborPair.Item1.GridCoordinate.y,
                         Q.GetGridValue(neighborPair.Item1.GridCoordinate.x, neighborPair.Item1.GridCoordinate.y) + transferAmount);
                 }
 
@@ -196,32 +219,32 @@ public class OccupancyMapController : Singleton<OccupancyMapController>
     }
 
     /// <summary>
-    /// Assigns the percievers (enemies) their current destinations.
+    /// Assigns the perceivers (enemies) their current destinations.
     /// </summary>
-    private void SetPercieverDestinations()
+    private void SetPerceiverDestinations()
     {
         if (!IsKnown()) return;
-        foreach (var perciever in percievers)
+        foreach (var perceiver in perceivers)
         {
-            perciever.Item2.SetDestination(lastKnownPosition.WorldPosition);
+            perceiver.Item2.SetDestination(lastKnownPosition.WorldPosition);
         }
     }
-
 
     public void Update()
     {
         // Check if any of our enemies can see the player right now.
         bool playerVisible = false;
-        foreach(var perciever in percievers)
+        foreach (var perceiver in perceivers)
         {
-            if (perciever.Item1.HasLOS(grid.GetGridTileAtWorldPosition(player.transform.position)))
+            if (perceiver.Item1.HasLOS(grid.GetGridTileAtWorldPosition(player.transform.position)))
             {
-                perciever.Item1.playerInSight = true;
+                perceiver.Item1.playerInSight = true;
                 playerVisible = true;
                 break;
-            } else
+            }
+            else
             {
-                perciever.Item1.playerInSight = false;
+                perceiver.Item1.playerInSight = false;
             }
         }
 
@@ -232,7 +255,8 @@ public class OccupancyMapController : Singleton<OccupancyMapController>
             lastKnownPosition = grid.GetGridTileAtWorldPosition(player.transform.position);
             lastKnownPosition.test = true;
             OccupancyMapSetPosition(lastKnownPosition);
-        } else
+        }
+        else
         {
             OccupancyMapUpdate();
         }
@@ -244,6 +268,6 @@ public class OccupancyMapController : Singleton<OccupancyMapController>
         }
 
         // Move our enemies.
-        SetPercieverDestinations();
+        //SetPerceiverDestinations(); This should now be handled by the spatial component
     }
 }
