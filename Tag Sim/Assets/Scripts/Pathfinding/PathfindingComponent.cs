@@ -43,9 +43,13 @@ public class PathfindingComponent : MonoBehaviour
         grid = GridComponent.Instance;
         tilemap = grid.GetTilemap();
         gridMap = grid.GetGridMap();
-        if (isPlayer == false)
+        //if (isPlayer == false)
+        //{
+        //    destination = GridComponent.Instance.GetTile(0, 0).WorldPosition;
+        //}
+        if (isPlayer)
         {
-            destination = GridComponent.Instance.GetTile(0, 0).WorldPosition;
+            destination = playerController.getDestination();
         }
     }
 

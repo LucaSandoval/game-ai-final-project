@@ -54,12 +54,14 @@ public class LevelManager : MonoBehaviour
         if (player == null) return;
 
         GridTile playerTile = grid.GetGridTileAtWorldPosition(player.transform.position);
+        //Debug.Log("Player Tile: " + playerTile);
 
         foreach (GameObject enemy in enemies)
         {
             if (enemy == null) continue;
 
             GridTile enemyTile = grid.GetGridTileAtWorldPosition(enemy.transform.position);
+            //Debug.Log("Enemy Tile: " + enemyTile);
 
             // if player and enemy are found on same tile
             if (playerTile == enemyTile)

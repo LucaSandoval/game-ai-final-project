@@ -364,6 +364,8 @@ MonoBehaviour:
   currentStamina: 0
   staminaBar: {fileID: 7194242571720690098}
   staminaCanvasGroup: {fileID: 9163608737458542954}
+  BaseTile: {fileID: 11400000, guid: 734c2743773128c4c838af04161af4de, type: 2}
+  GoalTile: {fileID: 11400000, guid: ac14cf320736a0e40bb5bf58819cbcc0, type: 2}
 --- !u!58 &8445069320889926441
 CircleCollider2D:
   m_ObjectHideFlags: 0
