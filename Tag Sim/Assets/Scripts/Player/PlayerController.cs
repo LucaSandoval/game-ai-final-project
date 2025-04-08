@@ -114,6 +114,13 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    // Get the current score 
+    //I needed this to get the score for the Game Over screens hope yall dont mind
+    public int GetScore()
+    {
+        return score;
+    }
+
     // Once the player has stepped on a goal tile, generate a new random one 10 tiles away
     private void SetNewGoalTile(Vector3Int currentTilePosition)
     {
