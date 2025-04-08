@@ -14,8 +14,9 @@ GameObject:
   - component: {fileID: 2482624947387426966}
   - component: {fileID: 3041779543816482016}
   - component: {fileID: 169848002818874204}
+  - component: {fileID: 7683792409665274562}
   m_Layer: 0
-  m_Name: Enemy
+  m_Name: BaseEnemy
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -80,7 +81,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 1
-  m_Sprite: {fileID: -3544955102345975608, guid: 3004e6ebd0e9eff459691df89f1be0dd, type: 3}
+  m_Sprite: {fileID: 2323917800338813707, guid: a0c9924df9a034f429c0d1de6322edfe, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -158,17 +159,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 955a7dd9dc68fa94399f482880ffe27e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxVisionRadius: 5
-  visionAngle: 60
-  playerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  obstacleMask:
-    serializedVersion: 2
-    m_Bits: 0
-  visionFalloff:
-    serializedVersion: 2
-    m_Curve: []
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
+  VisionAngle: 120
+  VisionDistance: 10
+  DebugLookDirection: 0
+  playerInSight: 0
+--- !u!114 &7683792409665274562
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 598890878101453146}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b52b398db9ee54b6c8adf91b04d59580, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SpatialFunction: {fileID: 11400000, guid: cc66947ca54a24c7da664ec443330fa0, type: 2}
+  PathfindToPositionToggle: 1
+  DebugToggle: 0
+  SearchWorstTile: 0

@@ -37,11 +37,11 @@ public class GridComponent : Singleton<GridComponent>
 
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0))
-        {
-            Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            debugGrid = test.Dijkstra(mousePos).Item1;
-        }
+        //if (Input.GetMouseButtonDown(0))
+        //{
+        //    Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        //    debugGrid = test.Dijkstra(mousePos).Item1;
+        //}
     }
 
     protected override void Awake()

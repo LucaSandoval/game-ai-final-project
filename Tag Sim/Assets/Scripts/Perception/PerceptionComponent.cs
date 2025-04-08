@@ -5,6 +5,7 @@ public class PerceptionComponent : MonoBehaviour
     [Header("Perception Settings")]
     [SerializeField] private float VisionAngle = 50f;
     [SerializeField] private float VisionDistance = 5f;
+    [SerializeField] private bool DebugLookDirection;
 
     private Vector2 lookDirection;
     private Rigidbody2D rb;
@@ -36,6 +37,8 @@ public class PerceptionComponent : MonoBehaviour
                 lookDirection = (player.transform.position - transform.position).normalized;
             }
         }
+
+        if(DebugLookDirection) Debug.DrawLine(transform.position, (Vector2)transform.position + lookDirection * 1.5f, Color.blue);
     }
 
     /// <summary>
@@ -108,6 +111,44 @@ public class PerceptionComponent : MonoBehaviour
         }
 
         return false;
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.blue;
+
+        // Get the forward direction of the enemy
+        Vector3 origin = transform.position;
+        Vector3 forward = lookDirection; // change to transform.up if up is your forward
+
+        // Calculate the two boundary directions of the FOV
+        float halfAngle = VisionAngle / 2f;
+
+        Quaternion leftRotation = Quaternion.Euler(0, 0, -halfAngle);
+        Quaternion rightRotation = Quaternion.Euler(0, 0, halfAngle);
+
+        Vector3 leftDirection = leftRotation * forward * VisionDistance;
+        Vector3 rightDirection = rightRotation * forward * VisionDistance;
+
+        // Draw vision cone
+        Gizmos.DrawLine(origin, origin + leftDirection);
+        Gizmos.DrawLine(origin, origin + rightDirection);
+        DrawVisionArc(origin, forward, VisionDistance, VisionAngle, 30); // 30 segments
+    }
+
+    void DrawVisionArc(Vector3 origin, Vector3 forward, float distance, float angle, int segments)
+    {
+        float halfAngle = angle / 2f;
+        float step = angle / segments;
+        Vector3 prevPoint = origin + Quaternion.Euler(0, 0, -halfAngle) * forward * distance;
+
+        for (int i = 1; i <= segments; i++)
+        {
+            float currentAngle = -halfAngle + step * i;
+            Vector3 nextPoint = origin + Quaternion.Euler(0, 0, currentAngle) * forward * distance;
+            Gizmos.DrawLine(prevPoint, nextPoint);
+            prevPoint = nextPoint;
+        }
     }
 }
 

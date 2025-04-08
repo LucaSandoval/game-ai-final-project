@@ -23,11 +23,13 @@ public class SpatialComponent : MonoBehaviour
     private Tilemap tilemap;
     private GridMap gridMap;
     private GridComponent grid;
+    private GameObject player;
 
     private void Awake()
     {
         MovementComponent = GetComponent<MovementComponent>();
         PathfindingComponent = GetComponent<PathfindingComponent>();
+        player = GameObject.FindGameObjectWithTag("Player");
     }
 
     private void Start()
@@ -177,6 +179,8 @@ public class SpatialComponent : MonoBehaviour
                         case SpatialInput.AgentDistance:
                             {
                                 Value = OccupancyMapController.GetDistanceToClosestPerceiver(grid.GetTile(x, y));
+                                // If the player is in sight, ignore this spatial function
+                                if (PerceptionComponent.HasLOS(grid.GetGridTileAtWorldPosition(player.transform.position))) Value = 0;
                                 break;
                             }
                         case SpatialInput.PathPrediction:
