@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 3041779543816482016}
   - component: {fileID: 169848002818874204}
   - component: {fileID: 7683792409665274562}
+  - component: {fileID: -6539181653244663100}
   m_Layer: 0
   m_Name: BaseEnemy
   m_TagString: Enemy
@@ -179,3 +180,21 @@ MonoBehaviour:
   PathfindToPositionToggle: 1
   DebugToggle: 0
   SearchWorstTile: 0
+--- !u!114 &-6539181653244663100
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 598890878101453146}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 95619e11cc0380343842c1a1c752fb1d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  aiType: 0
+  barkData: {fileID: 0}
+  speechBubblePrefab: {fileID: 0}
+  speechBubbleDuration: 2
+  bubbleOffset: {x: 0, y: 2, z: 0}
+  barkCooldown: 5

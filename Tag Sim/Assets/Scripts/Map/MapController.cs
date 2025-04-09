@@ -16,7 +16,7 @@ public class MapController : MonoBehaviour
 
     private void Awake()
     {
-        LevelID = 4;
+        LevelID = 3;
         // Enable the correct level and enemy set / disable incorrect ones
         EnableChildForLevelID(MapParent);
         EnableChildForLevelID(EnemyParent);

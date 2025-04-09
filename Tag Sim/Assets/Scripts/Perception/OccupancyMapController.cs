@@ -11,6 +11,10 @@ public class OccupancyMapController : Singleton<OccupancyMapController>
 
     private GridTile lastKnownPosition;
 
+    // Added for occupancy bark timing control.
+    private float occupancyLastBarkTime = 0f;
+    public float occupancyBarkInterval = 5f;  // Time (in seconds) between occupancy barks
+
     private void Start()
     {
         SeedStartingSearchLocation();
@@ -21,7 +25,7 @@ public class OccupancyMapController : Singleton<OccupancyMapController>
         return lastKnownPosition;
     }
 
-    /// </summary>
+    /// <summary>
     /// Find the closest perceiver to the given tile, not including the tile itself.
     /// </summary>
     public float GetDistanceToClosestPerceiver(GridTile tile)
@@ -82,9 +86,8 @@ public class OccupancyMapController : Singleton<OccupancyMapController>
     }
 
     /// <summary>
-    /// Do our enemies have any information.
+    /// Checks whether our enemies have any information.
     /// </summary>
-    /// <returns></returns>
     private bool IsKnown()
     {
         return lastKnownPosition != null;
@@ -92,22 +95,16 @@ public class OccupancyMapController : Singleton<OccupancyMapController>
 
     private void OccupancyMapUpdate()
     {
-        // STEP 1: Build a visibility map, based on the perception components of the AIs in the world
-        // The visibility map is a simple map where each cell is either 0 (not currently visible to ANY perceiver) or 1
-        // (currently visible to one or more perceivers).
-        // STEP 2: Clear out the probability in the visible cells
+        // STEP 1 & 2: Build a visibility map and clear out cells that are visible to any perceiver.
         (int, int) gridSize = occupancyMap.GetGridSize();
         for (int y = 0; y < gridSize.Item2; y++)
         {
             for (int x = 0; x < gridSize.Item1; x++)
             {
-                // Only evaluate valid and traversable tiles.
                 if (occupancyMap.GetTile(x, y) != null && occupancyMap.GetTile(x, y).Traversable)
                 {
                     foreach (var perceiver in perceivers)
                     {
-                        // Since we know at this point none of our visible cells contain the player,
-                        // we can safely elimanate all possibility from this tile.
                         if (perceiver.Item1.HasLOS(occupancyMap.GetTile(x, y)))
                         {
                             occupancyMap.SetGridValue(x, y, 0);
@@ -118,10 +115,10 @@ public class OccupancyMapController : Singleton<OccupancyMapController>
             }
         }
 
-        // STEP 3: Renormalize the OMap, so that it's still a valid probability distribution
+        // STEP 3: Renormalize the occupancy map.
         occupancyMap.Normalize();
 
-        // STEP 4: Extract the highest-likelihood cell on the omap and refresh the lastKnownPosition.
+        // STEP 4: Choose the tile with the highest likelihood as the new target.
         GridTile highestValue = occupancyMap.GetTile(0, 0);
         for (int y = 0; y < gridSize.Item2; y++)
         {
@@ -140,11 +137,11 @@ public class OccupancyMapController : Singleton<OccupancyMapController>
 
     private void OccupancyMapDiffuse()
     {
-        // Create our empty buffer
+        // Create an empty buffer grid.
         (int, int) gridSize = occupancyMap.GetGridSize();
         GridMap Q = new GridMap(gridSize.Item1, gridSize.Item2, 0);
 
-        // Iterate over occupancy map
+        // Diffuse probability among the cells.
         for (int y = 0; y < gridSize.Item2; y++)
         {
             for (int x = 0; x < gridSize.Item1; x++)
@@ -152,10 +149,8 @@ public class OccupancyMapController : Singleton<OccupancyMapController>
                 GridTile currentTile = occupancyMap.GetTile(x, y);
                 float currentProbability = occupancyMap.GetGridValue(x, y);
 
-                // Skip cells with no probability
                 if (currentProbability <= 0.0f) continue;
 
-                // List of neighbors
                 List<GridTile> neighbors = new List<GridTile>()
                 {
                     grid.GetTile(currentTile.GridCoordinate.x, currentTile.GridCoordinate.y + 1),
@@ -170,45 +165,35 @@ public class OccupancyMapController : Singleton<OccupancyMapController>
 
                 float totalWeight = 0.0f;
                 List<(GridTile, float)> validNeighbors = new List<(GridTile, float)>();
-                // Collect valid neighbors and compute weights
                 foreach (GridTile neighbor in neighbors)
                 {
-                    // Only valid neighbors that are traversable are eligible for diffusion
-                    if (neighbor == null) continue;
-                    if (!neighbor.Traversable) continue;
-
-                    // Determine diffusion 'weight' based on diagonals
+                    if (neighbor == null || !neighbor.Traversable) continue;
                     float weight = (Mathf.Abs(neighbor.GridCoordinate.x - x) == 1 && Mathf.Abs(neighbor.GridCoordinate.y - y) == 1)
-                                       ? 1.0f / Mathf.Sqrt(2.0f) : 1.0f;
+                                    ? 1.0f / Mathf.Sqrt(2.0f) : 1.0f;
                     validNeighbors.Add((neighbor, weight));
                     totalWeight += weight;
                 }
 
-                // If no valid neighbors don't change probability
                 if (validNeighbors.Count == 0)
                 {
                     Q.SetGridValue(x, y, currentProbability);
                     continue;
                 }
 
-                // Spread probability among valid neighbors, accounting for diagonals
                 float remainingProbability = currentProbability;
                 foreach (var neighborPair in validNeighbors)
                 {
                     float transferAmount = (currentProbability * neighborPair.Item2) / totalWeight;
                     remainingProbability -= transferAmount;
-
                     Q.SetGridValue(neighborPair.Item1.GridCoordinate.x, neighborPair.Item1.GridCoordinate.y,
                         Q.GetGridValue(neighborPair.Item1.GridCoordinate.x, neighborPair.Item1.GridCoordinate.y) + transferAmount);
                 }
-
-                // Keep the remaining probability in the original cell	
                 Q.SetGridValue(currentTile.GridCoordinate.x, currentTile.GridCoordinate.y,
-                        Q.GetGridValue(currentTile.GridCoordinate.x, currentTile.GridCoordinate.y) + remainingProbability);
+                    Q.GetGridValue(currentTile.GridCoordinate.x, currentTile.GridCoordinate.y) + remainingProbability);
             }
         }
 
-        // Update our occupancy map (and the original grid)
+        // Update the main occupancy map grid.
         for (int y = 0; y < gridSize.Item2; y++)
         {
             for (int x = 0; x < gridSize.Item1; x++)
@@ -219,7 +204,7 @@ public class OccupancyMapController : Singleton<OccupancyMapController>
     }
 
     /// <summary>
-    /// Assigns the perceivers (enemies) their current destinations.
+    /// Assigns each perceiver its current destination.
     /// </summary>
     private void SetPerceiverDestinations()
     {
@@ -232,7 +217,7 @@ public class OccupancyMapController : Singleton<OccupancyMapController>
 
     public void Update()
     {
-        // Check if any of our enemies can see the player right now.
+        // Check if any enemy sees the player.
         bool playerVisible = false;
         foreach (var perceiver in perceivers)
         {
@@ -248,7 +233,7 @@ public class OccupancyMapController : Singleton<OccupancyMapController>
             }
         }
 
-        // If they can, all enemies should move towards the player.
+        // When the player is visible, set the occupancy map position to the player's tile.
         if (playerVisible)
         {
             lastKnownPosition.test = false;
@@ -259,15 +244,29 @@ public class OccupancyMapController : Singleton<OccupancyMapController>
         else
         {
             OccupancyMapUpdate();
+
+            // Trigger occupancy-related bark if enough time has passed.
+            if (Time.time - occupancyLastBarkTime >= occupancyBarkInterval)
+            {
+                foreach (var perceiver in perceivers)
+                {
+                    AiBarkController barkController = perceiver.Item1.GetComponent<AiBarkController>();
+                    if (barkController != null)
+                    {
+                        barkController.BarkOccupancyUpdate();
+                    }
+                }
+                occupancyLastBarkTime = Time.time;
+            }
         }
 
-        // As long as I'm known, whether I'm immediate or not, diffuse the probability in the omap
+        // Diffuse the occupancy map if we have a valid known location.
         if (IsKnown())
         {
             OccupancyMapDiffuse();
         }
 
-        // Move our enemies.
-        //SetPerceiverDestinations(); This should now be handled by the spatial component
+        // Destination setting is now managed by the spatial component.
+        // SetPerceiverDestinations();
     }
 }
