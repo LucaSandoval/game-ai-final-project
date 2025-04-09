@@ -9,9 +9,17 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: -6539181653244663100, guid: 7a39e0fcf19c7c942a6a5fb300762644, type: 3}
+      propertyPath: barkData
+      value: 
+      objectReference: {fileID: 11400000, guid: daf4bae441a1daa4aa25f793467bedd2, type: 2}
+    - target: {fileID: -6539181653244663100, guid: 7a39e0fcf19c7c942a6a5fb300762644, type: 3}
       propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: -6539181653244663100, guid: 7a39e0fcf19c7c942a6a5fb300762644, type: 3}
+      propertyPath: textBooble
+      value: 
+      objectReference: {fileID: 4552031467323565417}
     - target: {fileID: -6539181653244663100, guid: 7a39e0fcf19c7c942a6a5fb300762644, type: 3}
       propertyPath: speechBubblePrefab
       value: 
@@ -89,3 +97,14 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7a39e0fcf19c7c942a6a5fb300762644, type: 3}
+--- !u!114 &4552031467323565417 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4660292948959489266, guid: 7a39e0fcf19c7c942a6a5fb300762644, type: 3}
+  m_PrefabInstance: {fileID: 9187553515323804059}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9541d86e2fd84c1d9990edf0852d74ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

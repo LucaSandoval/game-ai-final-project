@@ -1318,7 +1318,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2970181963256337660, guid: 6aa5f83abb25a814baa4b9e0e79c7092, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
   m_SourcePrefab: {fileID: 100100000, guid: 6aa5f83abb25a814baa4b9e0e79c7092, type: 3}
 --- !u!4 &647848912 stripped
 Transform:
@@ -10286,7 +10289,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2970181963256337660, guid: 6aa5f83abb25a814baa4b9e0e79c7092, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
   m_SourcePrefab: {fileID: 100100000, guid: 6aa5f83abb25a814baa4b9e0e79c7092, type: 3}
 --- !u!4 &1224267283 stripped
 Transform:
@@ -10471,7 +10477,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2970181963256337660, guid: 6aa5f83abb25a814baa4b9e0e79c7092, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
   m_SourcePrefab: {fileID: 100100000, guid: 6aa5f83abb25a814baa4b9e0e79c7092, type: 3}
 --- !u!4 &1293819205 stripped
 Transform:
@@ -23725,7 +23734,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2970181963256337660, guid: 6aa5f83abb25a814baa4b9e0e79c7092, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
   m_SourcePrefab: {fileID: 100100000, guid: 6aa5f83abb25a814baa4b9e0e79c7092, type: 3}
 --- !u!4 &1988769012 stripped
 Transform:
@@ -24344,9 +24356,17 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: -266.5
       objectReference: {fileID: 0}
+    - target: {fileID: 6277518707840486474, guid: f115e6e0a8e620b4aab88bcaaeff312e, type: 3}
+      propertyPath: m_PresetInfoIsWorld
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7514461984684339862, guid: f115e6e0a8e620b4aab88bcaaeff312e, type: 3}
       propertyPath: m_Name
       value: SpeechBubble
+      objectReference: {fileID: 0}
+    - target: {fileID: 7514461984684339862, guid: f115e6e0a8e620b4aab88bcaaeff312e, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: deefcc4a5c390194088ab15105355405, type: 3}
+  m_Name: ChaserBarkData
+  m_EditorClassIdentifier: 
+  playerSpottedLines:
+  - Target in my sights
+  - Runner wont be around much longer
+  - Guess we can call it a day early
+  - I found you
+  occupancyBarkLines:
+  - Searching this area
+  - 'Let me look over here '
+  - Let me check out this area
+  pathPredictionLines:
+  - Direct approach is best
+  - Full speed ahead
+  - Good luck outrunning me
+  - Coming right for you

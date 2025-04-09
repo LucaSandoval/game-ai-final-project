@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: deefcc4a5c390194088ab15105355405, type: 3}
+  m_Name: BlockerBarkData
+  m_EditorClassIdentifier: 
+  playerSpottedLines:
+  - Ill block off their escape
+  - Where do you think you are going
+  - Sorry pal this section is blocked off
+  occupancyBarkLines:
+  - Securing this strategic position
+  - Locking down this section
+  - Nothing is getting through me
+  pathPredictionLines:
+  - Guess my defense was too strong
+  - Now you are trapped
+  - Ooops is this where you were going

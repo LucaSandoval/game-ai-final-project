@@ -8,6 +8,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -6539181653244663100, guid: 7a39e0fcf19c7c942a6a5fb300762644, type: 3}
+      propertyPath: barkData
+      value: 
+      objectReference: {fileID: 11400000, guid: 5201ec8afc181b94fa89de2f4e693ede, type: 2}
+    - target: {fileID: -6539181653244663100, guid: 7a39e0fcf19c7c942a6a5fb300762644, type: 3}
+      propertyPath: textBooble
+      value: 
+      objectReference: {fileID: 5633260942013818544}
     - target: {fileID: 598890878101453146, guid: 7a39e0fcf19c7c942a6a5fb300762644, type: 3}
       propertyPath: m_Name
       value: Blocker Enemy
@@ -77,3 +85,14 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7a39e0fcf19c7c942a6a5fb300762644, type: 3}
+--- !u!114 &5633260942013818544 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4660292948959489266, guid: 7a39e0fcf19c7c942a6a5fb300762644, type: 3}
+  m_PrefabInstance: {fileID: 1045384062248421954}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9541d86e2fd84c1d9990edf0852d74ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class AiBarkController : MonoBehaviour
 {
@@ -20,7 +21,7 @@ public class AiBarkController : MonoBehaviour
 
     [Header("Speech Bubble Settings")]
     // Drag your World Space Speech Bubble Prefab here.
-    public GameObject speechBubblePrefab;
+    public TextMeshPro textBooble;
     // How long will the bubble display?
     public float speechBubbleDuration = 2f;
     // Position offset above the enemy for the bubble.
@@ -84,21 +85,20 @@ public class AiBarkController : MonoBehaviour
     /// </summary>
     private void ShowSpeechBubble(string message)
     {
-        if (speechBubblePrefab == null)
-        {
-            Debug.LogWarning("SpeechBubblePrefab is not assigned in AIBarkController");
-            return;
-        }
 
         // Instantiate the speech bubble as a child of this AI
-        GameObject bubble = Instantiate(speechBubblePrefab, transform.position + bubbleOffset, Quaternion.identity, transform);
+        //GameObject bubble = Instantiate(speechBubblePrefab, transform.position + bubbleOffset, Quaternion.identity, transform);
         // Get the Text component from the bubble
-        Text bubbleText = bubble.GetComponentInChildren<Text>();
-        if (bubbleText != null)
-        {
-            bubbleText.text = message;
-        }
-        // Automatically destroy the bubble after the desired duration
-        Destroy(bubble, speechBubbleDuration);
+
+        textBooble.gameObject.SetActive(true);
+        textBooble.text = message;
+        // Automatically disable the bubble after the desired duration
+        Invoke(nameof(fish), speechBubbleDuration);
+    }
+
+    void fish()
+    {
+
+        textBooble.gameObject.SetActive(false);
     }
 }
