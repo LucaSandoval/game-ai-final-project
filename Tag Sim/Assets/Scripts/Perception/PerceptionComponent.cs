@@ -35,12 +35,6 @@ public class PerceptionComponent : MonoBehaviour
             else
             {
                 lookDirection = (player.transform.position - transform.position).normalized;
-                // Get the AIBarkController component (make sure it is attached to the same GameObject).
-                AiBarkController barkController = GetComponent<AiBarkController>();
-                if (barkController != null)
-                {
-                    barkController.BarkPlayerSpotted();
-                }
             }
         }
 

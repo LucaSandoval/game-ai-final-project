@@ -20,6 +20,18 @@ PrefabInstance:
       propertyPath: textBooble
       value: 
       objectReference: {fileID: 2980793692210604135}
+    - target: {fileID: -6539181653244663100, guid: 7a39e0fcf19c7c942a6a5fb300762644, type: 3}
+      propertyPath: 'acknowledgmentLines.Array.data[2]'
+      value: On my way!
+      objectReference: {fileID: 0}
+    - target: {fileID: -6539181653244663100, guid: 7a39e0fcf19c7c942a6a5fb300762644, type: 3}
+      propertyPath: 'acknowledgmentLines.Array.data[3]'
+      value: Perfect!
+      objectReference: {fileID: 0}
+    - target: {fileID: -6539181653244663100, guid: 7a39e0fcf19c7c942a6a5fb300762644, type: 3}
+      propertyPath: 'acknowledgmentLines.Array.data[4]'
+      value: I know thats right!
+      objectReference: {fileID: 0}
     - target: {fileID: 598890878101453146, guid: 7a39e0fcf19c7c942a6a5fb300762644, type: 3}
       propertyPath: m_Name
       value: Hider Enemy
@@ -67,6 +79,18 @@ PrefabInstance:
     - target: {fileID: 3979155484073194735, guid: 7a39e0fcf19c7c942a6a5fb300762644, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4660292948959489266, guid: 7a39e0fcf19c7c942a6a5fb300762644, type: 3}
+      propertyPath: m_fontColor.b
+      value: 0.14117648
+      objectReference: {fileID: 0}
+    - target: {fileID: 4660292948959489266, guid: 7a39e0fcf19c7c942a6a5fb300762644, type: 3}
+      propertyPath: m_fontColor.g
+      value: 0.14117648
+      objectReference: {fileID: 0}
+    - target: {fileID: 4660292948959489266, guid: 7a39e0fcf19c7c942a6a5fb300762644, type: 3}
+      propertyPath: m_fontColor.r
+      value: 0.8862745
       objectReference: {fileID: 0}
     - target: {fileID: 7683792409665274562, guid: 7a39e0fcf19c7c942a6a5fb300762644, type: 3}
       propertyPath: SpatialFunction

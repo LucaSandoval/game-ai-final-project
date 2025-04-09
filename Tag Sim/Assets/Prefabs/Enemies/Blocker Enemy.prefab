@@ -13,6 +13,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 11400000, guid: 5201ec8afc181b94fa89de2f4e693ede, type: 2}
     - target: {fileID: -6539181653244663100, guid: 7a39e0fcf19c7c942a6a5fb300762644, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -6539181653244663100, guid: 7a39e0fcf19c7c942a6a5fb300762644, type: 3}
       propertyPath: textBooble
       value: 
       objectReference: {fileID: 5633260942013818544}
@@ -63,6 +67,18 @@ PrefabInstance:
     - target: {fileID: 3979155484073194735, guid: 7a39e0fcf19c7c942a6a5fb300762644, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4660292948959489266, guid: 7a39e0fcf19c7c942a6a5fb300762644, type: 3}
+      propertyPath: m_fontColor.b
+      value: 0.14222129
+      objectReference: {fileID: 0}
+    - target: {fileID: 4660292948959489266, guid: 7a39e0fcf19c7c942a6a5fb300762644, type: 3}
+      propertyPath: m_fontColor.g
+      value: 0.14222129
+      objectReference: {fileID: 0}
+    - target: {fileID: 4660292948959489266, guid: 7a39e0fcf19c7c942a6a5fb300762644, type: 3}
+      propertyPath: m_fontColor.r
+      value: 0.8867924
       objectReference: {fileID: 0}
     - target: {fileID: 7683792409665274562, guid: 7a39e0fcf19c7c942a6a5fb300762644, type: 3}
       propertyPath: SpatialFunction
