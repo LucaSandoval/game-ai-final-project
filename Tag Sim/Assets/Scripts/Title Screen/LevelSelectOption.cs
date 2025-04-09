@@ -4,6 +4,9 @@ using UnityEngine.UI;
 
 public class LevelSelectOption : MonoBehaviour, IPointerClickHandler
 {
+    [Header("Select Sound")]
+    [SerializeField] private Sound SelectSound;
+
     [SerializeField] private Image BGImage;
     [SerializeField] private Text NameText;
     [SerializeField] private int LevelID;
@@ -34,6 +37,7 @@ public class LevelSelectOption : MonoBehaviour, IPointerClickHandler
     {
         if (selectComponent)
         {
+            SoundController.Instance?.PlaySoundRandomPitch(SelectSound, 0.05f);
             selectComponent.SelectLevel(this);
         }
     }

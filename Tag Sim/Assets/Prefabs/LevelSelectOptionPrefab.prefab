@@ -128,6 +128,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f3c775fb9bec2854e9171b0436e35edd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  SelectSound: {fileID: 11400000, guid: 54759d747ac85fb4ab80b30d1282adfe, type: 2}
   BGImage: {fileID: 3247171398379898570}
   NameText: {fileID: 5696204962662135708}
   LevelID: 0
