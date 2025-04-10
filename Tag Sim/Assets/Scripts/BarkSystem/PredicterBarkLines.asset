@@ -15,9 +15,9 @@ MonoBehaviour:
   aiName: Enemy
   bubbleColor: {r: 1, g: 1, b: 1, a: 1}
   playerSpottedLines:
-  - Target sighted!!!
-  - I knew it they are right here
-  - Of course this is where a hashbrown would be
+  - Target sighted...
+  - This ain't my first capture...
+  - Found the hashbrown, just as planned...
   occupancyBarkLines: []
   pathPredictionLines: []
   idleLines: []

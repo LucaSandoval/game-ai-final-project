@@ -15,10 +15,10 @@ MonoBehaviour:
   aiName: Enemy
   bubbleColor: {r: 1, g: 1, b: 1, a: 1}
   playerSpottedLines:
-  - You're hiding days are over cat
-  - 'Guess your cover was blown '
-  - Next time leave the hiding to me
-  - Look who we have here
+  - Found you, little mouse...
+  - Guess your cover was blown...
+  - Did I surprise ya?
+  - Look who we have here...
   occupancyBarkLines: []
   pathPredictionLines: []
   idleLines: []

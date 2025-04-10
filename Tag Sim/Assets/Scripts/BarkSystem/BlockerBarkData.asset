@@ -15,9 +15,9 @@ MonoBehaviour:
   aiName: Enemy
   bubbleColor: {r: 1, g: 1, b: 1, a: 1}
   playerSpottedLines:
-  - Hey caught the runner ... running
-  - Team it seems like we have a lost cat overhere.
-  - Sorry pal I think you are in the wrong neighborhood
+  - Found the runner, over...
+  - Seems like we found a lost cat..
+  - 'You''re in the wrong neighborhood! '
   occupancyBarkLines: []
   pathPredictionLines: []
   idleLines: []

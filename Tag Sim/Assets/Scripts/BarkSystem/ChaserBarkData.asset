@@ -15,10 +15,12 @@ MonoBehaviour:
   aiName: Enemy
   bubbleColor: {r: 1, g: 1, b: 1, a: 1}
   playerSpottedLines:
-  - Target in my sights
-  - Runner wont be around much longer
-  - Guess we can call it a day early
-  - I found them
+  - In my sights!
+  - 'Runner''s almost out of time!
+
+'
+  - Looks like we can go home early...
+  - 'Found them! '
   occupancyBarkLines: []
   pathPredictionLines: []
   idleLines: []
