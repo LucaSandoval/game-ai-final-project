@@ -13,8 +13,6 @@ public class EndScreenController : MonoBehaviour
         scoreText.text = $"Your Score: {finalScore}";
     }
 
-    //I have no idea if I am doing this right I am a little confused with where we are creating our levels
-    //High key might not even use a restart button
     public void RetryLevel()
     {
         SceneManager.LoadScene("MainLevel");

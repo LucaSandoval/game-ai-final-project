@@ -47,7 +47,7 @@ public class SoundController : Singleton<SoundController>
     // perform a new allocation for every sound call
     private void AllocateNewAudioSources(int ammount)
     {
-        for(int i = 0; i < ammount; i++)
+        for (int i = 0; i < ammount; i++)
         {
             freeSources.Enqueue(gameObject.AddComponent<AudioSource>());
         }
@@ -77,9 +77,11 @@ public class SoundController : Singleton<SoundController>
         return true;
     }
 
+    // <summary>
     // Checks if the given sound by name can be played. If the sound doesn't currently
     // have an audio source, one will be created. Will only return false if creating
     // the audio source failed- ie. the sound cannot be loaded from the given resource path.
+    // <summary>
     private bool CanPlaySound(Sound s)
     {
         if (!SoundLookup.ContainsKey(s))
@@ -100,14 +102,12 @@ public class SoundController : Singleton<SoundController>
             {
                 if (loopingSounds[i] == soundsToFade[x])
                 {
-                    //Determine if the fade is IN or OUT
+                    // Determine if the fade is IN or OUT
                     if (fadeINOUTRequests[x] == true)
                     {
-                        //IN
-
-                        //If there is a looping sound that gets a fade request, decrease its volume by the rate
+                        // If there is a looping sound that gets a fade request, decrease its volume by the rate
                         SoundLookup[loopingSounds[i]].volume += Time.deltaTime * soundFadeRate[x];
-                        //If this makes it silent, pause the sound.
+                        // If this makes it silent, pause the sound.
                         if (SoundLookup[loopingSounds[i]].volume >= loopingSounds[i].BaseVolume)
                         {
                             soundsToFade.Remove(soundsToFade[x]);
@@ -117,11 +117,9 @@ public class SoundController : Singleton<SoundController>
                     }
                     else
                     {
-                        //OUT
-
-                        //If there is a looping sound that gets a fade request, decrease its volume by the rate
+                        // If there is a looping sound that gets a fade request, decrease its volume by the rate
                         SoundLookup[loopingSounds[i]].volume -= Time.deltaTime * soundFadeRate[x];
-                        //If this makes it silent, pause the sound.
+                        // If this makes it silent, pause the sound.
                         if (SoundLookup[loopingSounds[i]].volume <= 0)
                         {
                             //PauseSound(loopingSounds[i]);

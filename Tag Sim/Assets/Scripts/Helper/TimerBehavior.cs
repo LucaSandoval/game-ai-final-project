@@ -58,6 +58,9 @@ public class TimerBehavior : MonoBehaviour
         if (PlayerController.GoalTilesLeft == 0) scoreText.color = Color.green;
     }
 
+    // <summary>
+    // Displays the time in MM:SS format
+    // </summary>
     void DisplayTime(float timeToDisplay)
     {
         timeToDisplay += 1;
@@ -68,6 +71,9 @@ public class TimerBehavior : MonoBehaviour
         timerText.text = string.Format("{0:00}:{1:00}", minutes, seconds);
     }
 
+    // <summary>
+    // Updates the color of the timer text based on the remaining time
+    // </summary>
     void UpdateColor()
     {
         if (useColorInterpolation)
@@ -81,17 +87,24 @@ public class TimerBehavior : MonoBehaviour
         }
     }
 
+    // <summary>
+    // Checks if the player has won or lost.
+    // </summary>
     public void CheckForWin()
     {
         if (PlayerController.GoalTilesLeft == 0)
         {
             StartCoroutine(TimerFinished());
-        } else
+        }
+        else
         {
             levelManager.DoGameOverGoalFailed();
         }
     }
 
+    // <summary>
+    // Coroutine to handle the end of the timer.
+    // </summary>
     private IEnumerator TimerFinished()
     {
         SoundController.Instance?.PlaySound(WinSound);

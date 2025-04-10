@@ -4,26 +4,17 @@ using UnityEngine;
 
 public class AiComunication : MonoBehaviour
 {
-    // Singleton instance
     public static AiComunication Instance { get; private set; }
 
     [Header("Communication Settings")]
     // Delay before acknowledgments appear after the initial spotting
     public float acknowledgmentDelay = 0.5f;
 
-    // Cooldown for lost player reports
     public float lostPlayerReportCooldown = 5f;
 
-    // All AI bark controllers in the scene
     private List<AiBarkController> aiControllers = new List<AiBarkController>();
-
-    // Track if communication is currently happening
     private bool isCommunicating = false;
-
-    // Track when the last lost player report happened
     private float lastLostPlayerReportTime = -9999f;
-
-    // Track who was the last AI to spot the player
     private AiBarkController lastSpotter = null;
 
     private void Awake()
@@ -35,9 +26,6 @@ public class AiComunication : MonoBehaviour
             return;
         }
         Instance = this;
-
-        // Persist between scenes if needed
-        // DontDestroyOnLoad(gameObject);
     }
 
     private void Start()
@@ -52,7 +40,7 @@ public class AiComunication : MonoBehaviour
     public void FindAllAiControllers()
     {
         aiControllers.Clear();
-        AiBarkController[] controllers = FindObjectsOfType<AiBarkController>();
+        AiBarkController[] controllers = FindObjectsByType<AiBarkController>(FindObjectsSortMode.None);
 
         foreach (AiBarkController controller in controllers)
         {
@@ -100,7 +88,7 @@ public class AiComunication : MonoBehaviour
     }
 
     /// <summary>
-    /// Called when the player is lost by all AIs
+    /// Called when the player's location is lost by all AIs.
     /// </summary>
     public void ReportPlayerLost()
     {
@@ -121,7 +109,7 @@ public class AiComunication : MonoBehaviour
     }
 
     /// <summary>
-    /// Chooses which AI should report the player being lost
+    /// Chooses which AI should report the player being lost.
     /// </summary>
     private AiBarkController ChoosePlayerLostReporter()
     {
@@ -152,7 +140,7 @@ public class AiComunication : MonoBehaviour
     }
 
     /// <summary>
-    /// Coroutine that manages the simultaneous AI responses
+    /// Coroutine that manages the simultaneous AI responses.
     /// </summary>
     private IEnumerator SimultaneousCommunicationSequence(AiBarkController spotter)
     {

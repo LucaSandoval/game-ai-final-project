@@ -26,8 +26,8 @@ public class PlayerController : MonoBehaviour
 
     private Vector2 lastPosition; // Track the last position for movement check
 
-    private int score = 0; 
-    private Tilemap goalTilemap; 
+    private int score = 0;
+    private Tilemap goalTilemap;
     public Tile BaseTile;
     public Tile GoalTile;
 
@@ -44,7 +44,7 @@ public class PlayerController : MonoBehaviour
         gridComponent = GridComponent.Instance;
         movementComponent = GetComponent<MovementComponent>();
 
-        goalTilemap = gridComponent.GetTilemap(); 
+        goalTilemap = gridComponent.GetTilemap();
 
         originalSpeed = movementComponent.GetSpeed();
         sprintSpeed = originalSpeed * 2;
@@ -119,8 +119,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    // Get the current score 
-    //I needed this to get the score for the Game Over screens hope yall dont mind
+    // Get the current score for use in the GameOver screen.
     public int GetScore()
     {
         return score;
@@ -141,7 +140,7 @@ public class PlayerController : MonoBehaviour
             int randomY = Random.Range(goalTilemap.origin.y, goalTilemap.origin.y + gridSize.y);
             newGoalPosition = new Vector3Int(randomX, randomY, currentTilePosition.z);
 
-        } while (Vector3Int.Distance(newGoalPosition, currentTilePosition) < 10 || 
+        } while (Vector3Int.Distance(newGoalPosition, currentTilePosition) < 10 ||
                  goalTilemap.GetTile(newGoalPosition) != BaseTile);
 
         // Set the new GoalTile

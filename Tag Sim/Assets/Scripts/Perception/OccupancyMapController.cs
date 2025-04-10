@@ -267,6 +267,5 @@ public class OccupancyMapController : Singleton<OccupancyMapController>
         }
 
         // Destination setting is now managed by the spatial component.
-        // SetPerceiverDestinations();
     }
 }

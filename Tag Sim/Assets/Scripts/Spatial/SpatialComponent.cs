@@ -1,6 +1,4 @@
 using UnityEngine;
-using System.Collections.Generic;
-using UnityEngine.Tilemaps;
 
 /// <summary>
 /// Component responsible for helping our agents make decisions about where to move in the world.
@@ -15,29 +13,15 @@ public class SpatialComponent : MonoBehaviour
     [Header("Spatial Function Settings")]
     [SerializeField] private SpatialFunction SpatialFunction;
 
+
     [Header("Spatial Component Settings")]
     [SerializeField] private bool PathfindToPositionToggle;
     [SerializeField] private bool DebugToggle;
-    [SerializeField] private bool SearchWorstTile; 
-    private List<GameObject> enemies;
-    private Tilemap tilemap;
-    private GridMap gridMap;
-    private GridComponent grid;
-    private GameObject player;
 
     private void Awake()
     {
         MovementComponent = GetComponent<MovementComponent>();
         PathfindingComponent = GetComponent<PathfindingComponent>();
-        player = GameObject.FindGameObjectWithTag("Player");
-    }
-
-    private void Start()
-    {
-        enemies = new List<GameObject>(GameObject.FindGameObjectsWithTag("Enemy"));
-        grid = GridComponent.Instance;
-        tilemap = grid.GetTilemap();
-        gridMap = grid.GetGridMap();
     }
 
     public void Update()
@@ -45,17 +29,8 @@ public class SpatialComponent : MonoBehaviour
         ChoosePosition();
     }
 
-    private void ResetClaimed() 
-    {
-        foreach (GridTile tile in gridMap.GetTiles())
-        {
-            tile.IsClaimed = false;
-        }
-    }
-
     public bool ChoosePosition()
     {
-        //Debug.Log("I am enemy of index " + enemies.IndexOf(gameObject) + " and I am choosing a position.");
         GridComponent grid = GridComponent.Instance;
         bool Result = false;
 
@@ -86,8 +61,8 @@ public class SpatialComponent : MonoBehaviour
             EvaluateLayer(Layer, DistanceMap, GridMap);
         }
 
-        // Step 3 - Pick the best or worst cell in GridMap 
-        float TargetScore = SearchWorstTile ? float.MaxValue : float.MinValue;
+        // Step 3 - Pick the best cell in GridMap
+        float BestScore = float.MinValue;
         (int, int) gridSize = GridMap.GetGridSize();
         for (int y = 0; y < gridSize.Item2; y++)
         {
@@ -98,37 +73,27 @@ public class SpatialComponent : MonoBehaviour
                 if (CurrentDistance < float.MaxValue)
                 {
                     float CurrentScore = GridMap.GetGridValue(x, y);
-
-                    // Found a better score! 
-                    // If searching for the worst tile, better score is lower but not 0
-                    if ((SearchWorstTile && CurrentScore < TargetScore && CurrentScore > 0) || 
-                        (!SearchWorstTile && CurrentScore > TargetScore))
+                    if (CurrentScore > BestScore)
                     {
-                        TargetScore = CurrentScore;
+                        BestScore = CurrentScore;
                         BestCell = grid.GetTile(x, y);
-                        BestCell.IsClaimed = true;
                         Result = true;
                     }
                 }
             }
         }
 
-        // Step 4 - If we are pathfinding, set the movement path to the best or worst cell
+        // Step 4 - If we are pathfinding, set the movement path to the best cell
         if (PathfindToPositionToggle)
         {
             if (BestCell != null)
             {
                 if (DebugToggle)
                 {
-                    Debug.DrawLine(transform.position, BestCell.WorldPosition, SearchWorstTile ? Color.blue : Color.red);
+                    Debug.DrawLine(transform.position, BestCell.WorldPosition, Color.red);
                 }
                 PathfindingComponent.SetDestination(BestCell.WorldPosition);
             }
-        }
-
-        if(enemies.IndexOf(gameObject) == enemies.Count - 1)
-        {
-            ResetClaimed();
         }
 
         return Result;
@@ -179,8 +144,6 @@ public class SpatialComponent : MonoBehaviour
                         case SpatialInput.AgentDistance:
                             {
                                 Value = OccupancyMapController.GetDistanceToClosestPerceiver(grid.GetTile(x, y));
-                                // If the player is in sight, ignore this spatial function
-                                if (PerceptionComponent.HasLOS(grid.GetGridTileAtWorldPosition(player.transform.position))) Value = 0;
                                 break;
                             }
                         case SpatialInput.PathPrediction:

@@ -3,7 +3,7 @@ using UnityEngine.Tilemaps;
 
 /// <summary>
 /// Component that manages a gridMap as a physical grid within the world, with tiles occupying space.
-/// Provides a series of useful functions for tranlating between world and grid coordinates, tile distance etc...
+/// Provides a series of useful functions for tranlating between world and grid coordinates, tile distance, etc.
 /// </summary>
 public class GridComponent : Singleton<GridComponent>
 {
@@ -33,15 +33,6 @@ public class GridComponent : Singleton<GridComponent>
         {
             Debug.LogWarning("GridComponent: 'test' PathfindingComponent is not assigned.");
         }
-    }
-
-    private void Update()
-    {
-        //if (Input.GetMouseButtonDown(0))
-        //{
-        //    Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        //    debugGrid = test.Dijkstra(mousePos).Item1;
-        //}
     }
 
     protected override void Awake()
@@ -83,9 +74,9 @@ public class GridComponent : Singleton<GridComponent>
             }
 
             float halfTileWidth = TileWorldSize / 2;
-            gridTopLeft = new Vector2(newGridTiles[0, Height - 1].WorldPosition.x - halfTileWidth, 
+            gridTopLeft = new Vector2(newGridTiles[0, Height - 1].WorldPosition.x - halfTileWidth,
                 newGridTiles[0, Height - 1].WorldPosition.y + halfTileWidth);
-            gridBottomRight = new Vector2(newGridTiles[Width - 1, 0].WorldPosition.x + halfTileWidth, 
+            gridBottomRight = new Vector2(newGridTiles[Width - 1, 0].WorldPosition.x + halfTileWidth,
                 newGridTiles[Width - 1, 0].WorldPosition.y - halfTileWidth);
 
             mainGrid = new GridMap(Width, Height, newGridTiles);
@@ -133,9 +124,9 @@ public class GridComponent : Singleton<GridComponent>
             }
 
             float halfTileWidth = TileWorldSize / 2;
-            gridTopLeft = new Vector2(newGridTiles[0, 0].WorldPosition.x - halfTileWidth, 
+            gridTopLeft = new Vector2(newGridTiles[0, 0].WorldPosition.x - halfTileWidth,
                 newGridTiles[0, 0].WorldPosition.y + halfTileWidth);
-            gridBottomRight = new Vector2(newGridTiles[Width - 1, Height - 1].WorldPosition.x + halfTileWidth, 
+            gridBottomRight = new Vector2(newGridTiles[Width - 1, Height - 1].WorldPosition.x + halfTileWidth,
                 newGridTiles[Width - 1, Height - 1].WorldPosition.y - halfTileWidth);
 
             mainGrid = new GridMap(Width, Height, newGridTiles);
@@ -247,7 +238,8 @@ public class GridComponent : Singleton<GridComponent>
                     {
                         Gizmos.color = Color.blue;
                         Gizmos.DrawCube(pos, Vector3.one * 0.4f);
-                    } else
+                    }
+                    else
                     {
                         Gizmos.color = Color.Lerp(Color.green, Color.red, tile.Value);
                         Gizmos.DrawCube(pos, Vector3.one * 0.4f);

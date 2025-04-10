@@ -97,7 +97,7 @@ public class AiBarkController : MonoBehaviour
         {
             // Check if any AI still sees the player
             bool anyAiSeesPlayer = false;
-            AiBarkController[] allControllers = FindObjectsOfType<AiBarkController>();
+            AiBarkController[] allControllers = FindObjectsByType<AiBarkController>(FindObjectsSortMode.None);
 
             foreach (AiBarkController controller in allControllers)
             {
@@ -142,7 +142,6 @@ public class AiBarkController : MonoBehaviour
     public void BarkAcknowledge()
     {
         // No cooldown check for acknowledgments since they're managed by the communication system
-
         string message = "";
         if (acknowledgmentLines.Length > 0)
         {
@@ -159,7 +158,6 @@ public class AiBarkController : MonoBehaviour
             ShowSpeechBubble(message);
         }
 
-        // Update the last bark time
         lastBarkTime = Time.time;
     }
 
@@ -185,7 +183,6 @@ public class AiBarkController : MonoBehaviour
             ShowSpeechBubble(message);
         }
 
-        // Update the last bark time
         lastBarkTime = Time.time;
     }
 

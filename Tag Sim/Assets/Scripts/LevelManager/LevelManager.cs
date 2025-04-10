@@ -14,7 +14,7 @@ public class LevelManager : MonoBehaviour
     private List<GameObject> enemies;
     private GameObject player;
     private bool isGameOver = false;
-    //private bool isGamePaused = false;
+
     private GridComponent grid;
     private Tilemap tilemap;
     private GridMap gridMap;
@@ -65,21 +65,18 @@ public class LevelManager : MonoBehaviour
         if (player == null) return;
 
         GridTile playerTile = grid.GetGridTileAtWorldPosition(player.transform.position);
-        //Debug.Log("Player Tile: " + playerTile);
 
         foreach (GameObject enemy in enemies)
         {
             if (enemy == null) continue;
 
             GridTile enemyTile = grid.GetGridTileAtWorldPosition(enemy.transform.position);
-            //Debug.Log("Enemy Tile: " + enemyTile);
 
             // if player and enemy are found on same tile
             if (playerTile == enemyTile)
             {
                 isGameOver = true;
                 Debug.Log("Game Over! The player was caught.");
-                // functions for when game ends go here bro
                 StartCoroutine(GameOverCaught());
                 break;
             }
@@ -115,7 +112,7 @@ public class LevelManager : MonoBehaviour
         SceneManager.LoadScene("Title Screen");
     }
 
-    private void SetEnemyOccupancy() 
+    private void SetEnemyOccupancy()
     {
         foreach (GameObject enemy in enemies)
         {
@@ -125,7 +122,7 @@ public class LevelManager : MonoBehaviour
         }
     }
 
-    private void ResetOccupancy() 
+    private void ResetOccupancy()
     {
         foreach (GridTile tile in gridMap.GetTiles())
         {
