@@ -102,15 +102,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4660292948959489266, guid: 7a39e0fcf19c7c942a6a5fb300762644, type: 3}
       propertyPath: m_fontColor.b
-      value: 0.14117648
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4660292948959489266, guid: 7a39e0fcf19c7c942a6a5fb300762644, type: 3}
       propertyPath: m_fontColor.g
-      value: 0.14117648
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4660292948959489266, guid: 7a39e0fcf19c7c942a6a5fb300762644, type: 3}
       propertyPath: m_fontColor.r
-      value: 0.8862745
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7683792409665274562, guid: 7a39e0fcf19c7c942a6a5fb300762644, type: 3}
       propertyPath: SpatialFunction
