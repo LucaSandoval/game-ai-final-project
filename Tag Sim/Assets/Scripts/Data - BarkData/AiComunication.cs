@@ -11,11 +11,20 @@ public class AiComunication : MonoBehaviour
     // Delay before acknowledgments appear after the initial spotting
     public float acknowledgmentDelay = 0.5f;
 
+    // Cooldown for lost player reports
+    public float lostPlayerReportCooldown = 5f;
+
     // All AI bark controllers in the scene
     private List<AiBarkController> aiControllers = new List<AiBarkController>();
 
     // Track if communication is currently happening
     private bool isCommunicating = false;
+
+    // Track when the last lost player report happened
+    private float lastLostPlayerReportTime = -9999f;
+
+    // Track who was the last AI to spot the player
+    private AiBarkController lastSpotter = null;
 
     private void Awake()
     {
@@ -84,7 +93,62 @@ public class AiComunication : MonoBehaviour
         if (isCommunicating)
             return;
 
+        // Remember who spotted the player
+        lastSpotter = spotter;
+
         StartCoroutine(SimultaneousCommunicationSequence(spotter));
+    }
+
+    /// <summary>
+    /// Called when the player is lost by all AIs
+    /// </summary>
+    public void ReportPlayerLost()
+    {
+        // Only allow reports after the cooldown time has passed
+        if (Time.time - lastLostPlayerReportTime < lostPlayerReportCooldown || isCommunicating)
+            return;
+
+        // Update the report time
+        lastLostPlayerReportTime = Time.time;
+
+        // Choose which AI will report the lost player
+        AiBarkController reporter = ChoosePlayerLostReporter();
+
+        if (reporter != null)
+        {
+            reporter.BarkPlayerLost();
+        }
+    }
+
+    /// <summary>
+    /// Chooses which AI should report the player being lost
+    /// </summary>
+    private AiBarkController ChoosePlayerLostReporter()
+    {
+        // If the last spotter is still active, have them report
+        if (lastSpotter != null && lastSpotter.gameObject.activeInHierarchy)
+        {
+            return lastSpotter;
+        }
+
+        // Otherwise, find all active AIs and pick one
+        List<AiBarkController> activeControllers = new List<AiBarkController>();
+        foreach (AiBarkController controller in aiControllers)
+        {
+            if (controller.gameObject.activeInHierarchy)
+            {
+                activeControllers.Add(controller);
+            }
+        }
+
+        // If we have any active AIs, pick one randomly
+        if (activeControllers.Count > 0)
+        {
+            return activeControllers[Random.Range(0, activeControllers.Count)];
+        }
+
+        // If no AIs are available, return null
+        return null;
     }
 
     /// <summary>

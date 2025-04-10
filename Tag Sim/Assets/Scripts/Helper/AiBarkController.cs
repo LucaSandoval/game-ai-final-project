@@ -39,10 +39,21 @@ public class AiBarkController : MonoBehaviour
         "On it!",
         "Copy that!",
         "Understood!",
-        "Moving now!"
+        "Moving there now!"
+    };
+
+    [Header("Player Lost Lines")]
+    [Tooltip("Lines this AI will say when reporting the player is lost")]
+    [TextArea(2, 5)]
+    public string[] playerLostLines = new string[] {
+        "I've lost them!",
+        "Target disappeared!",
+        "They're gone!",
+        "Where did they go?"
     };
 
     private PerceptionComponent perception;
+    private bool wasPlayerInSight = false;
 
     private void Start()
     {
@@ -64,8 +75,11 @@ public class AiBarkController : MonoBehaviour
 
     private void Update()
     {
+        // Track if player was in sight last frame
+        bool playerIsInSight = perception != null && perception.playerInSight;
+
         // If we see the player and we haven't barked recently, report to the communication system
-        if (perception != null && perception.playerInSight && Time.time - lastBarkTime >= barkCooldown)
+        if (playerIsInSight && Time.time - lastBarkTime >= barkCooldown)
         {
             if (AiComunication.Instance != null)
             {
@@ -77,6 +91,33 @@ public class AiBarkController : MonoBehaviour
                 BarkPlayerSpotted();
             }
         }
+
+        // Check if all AIs have lost the player
+        if (wasPlayerInSight && !playerIsInSight)
+        {
+            // Check if any AI still sees the player
+            bool anyAiSeesPlayer = false;
+            AiBarkController[] allControllers = FindObjectsOfType<AiBarkController>();
+
+            foreach (AiBarkController controller in allControllers)
+            {
+                PerceptionComponent otherPerception = controller.GetComponent<PerceptionComponent>();
+                if (otherPerception != null && otherPerception.playerInSight)
+                {
+                    anyAiSeesPlayer = true;
+                    break;
+                }
+            }
+
+            // If no AI sees the player, report lost
+            if (!anyAiSeesPlayer && AiComunication.Instance != null)
+            {
+                AiComunication.Instance.ReportPlayerLost();
+            }
+        }
+
+        // Update previous state
+        wasPlayerInSight = playerIsInSight;
     }
 
     /// <summary>
@@ -111,6 +152,33 @@ public class AiBarkController : MonoBehaviour
         {
             // Fall back to occupancy lines if no acknowledgment lines are defined
             message = barkData.occupancyBarkLines[Random.Range(0, barkData.occupancyBarkLines.Length)];
+        }
+
+        if (!string.IsNullOrEmpty(message))
+        {
+            ShowSpeechBubble(message);
+        }
+
+        // Update the last bark time
+        lastBarkTime = Time.time;
+    }
+
+    /// <summary>
+    /// Call this when the AI reports the player is lost
+    /// </summary>
+    public void BarkPlayerLost()
+    {
+        // No cooldown check since this is managed by the communication system
+
+        string message = "";
+        if (playerLostLines.Length > 0)
+        {
+            message = playerLostLines[Random.Range(0, playerLostLines.Length)];
+        }
+        else if (barkData != null && barkData.confusedLines != null && barkData.confusedLines.Length > 0)
+        {
+            // Fall back to confused lines if available
+            message = barkData.confusedLines[Random.Range(0, barkData.confusedLines.Length)];
         }
 
         if (!string.IsNullOrEmpty(message))
