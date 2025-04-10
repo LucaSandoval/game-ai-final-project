@@ -12,15 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: deefcc4a5c390194088ab15105355405, type: 3}
   m_Name: PredicterBarkLines
   m_EditorClassIdentifier: 
+  aiName: Enemy
+  bubbleColor: {r: 1, g: 1, b: 1, a: 1}
   playerSpottedLines:
   - Target sighted!!!
   - I knew it they are right here
   - Of course this is where a hashbrown would be
-  occupancyBarkLines:
-  - If I were a McDonalds hashbrown where would I be
-  - Where is this stupid cat
-  - I think they are likely over here
-  pathPredictionLines:
-  - 'Ill cut them off '
-  - They are so predictable
-  - Ill be a step ahead of them
+  occupancyBarkLines: []
+  pathPredictionLines: []
+  idleLines: []
+  confusedLines: []
+  idleBarkFrequency: 15
+  idleBarkProbability: 0.3
+  barkDuration: 0

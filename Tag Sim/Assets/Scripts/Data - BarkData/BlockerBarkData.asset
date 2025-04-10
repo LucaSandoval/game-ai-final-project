@@ -12,15 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: deefcc4a5c390194088ab15105355405, type: 3}
   m_Name: BlockerBarkData
   m_EditorClassIdentifier: 
+  aiName: Enemy
+  bubbleColor: {r: 1, g: 1, b: 1, a: 1}
   playerSpottedLines:
-  - Ill block off their escape
-  - Where do you think you are going
-  - Sorry pal this section is blocked off
-  occupancyBarkLines:
-  - Securing this strategic position
-  - Locking down this section
-  - Nothing is getting through me
-  pathPredictionLines:
-  - Guess my defense was too strong
-  - Now you are trapped
-  - Ooops is this where you were going
+  - Hey caught the runner ... running
+  - Team it seems like we have a lost cat overhere.
+  - Sorry pal I think you are in the wrong neighborhood
+  occupancyBarkLines: []
+  pathPredictionLines: []
+  idleLines: []
+  confusedLines: []
+  idleBarkFrequency: 15
+  idleBarkProbability: 0.3
+  barkDuration: 0

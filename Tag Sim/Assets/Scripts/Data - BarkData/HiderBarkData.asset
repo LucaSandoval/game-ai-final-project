@@ -12,16 +12,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: deefcc4a5c390194088ab15105355405, type: 3}
   m_Name: HiderBarkData
   m_EditorClassIdentifier: 
+  aiName: Enemy
+  bubbleColor: {r: 1, g: 1, b: 1, a: 1}
   playerSpottedLines:
   - You're hiding days are over cat
   - 'Guess your cover was blown '
   - Next time leave the hiding to me
-  occupancyBarkLines:
-  - Started scouting
-  - Staying out of sight
-  - Ill find them before they find me
-  pathPredictionLines:
-  - Time to hide and catch them lacking
-  - Guess we can call it a day early
-  - 'Ill be honest I like the cat I dont know why we have to catch them what did
-    they even do wrong '
+  - Look who we have here
+  occupancyBarkLines: []
+  pathPredictionLines: []
+  idleLines: []
+  confusedLines: []
+  idleBarkFrequency: 15
+  idleBarkProbability: 0.3
+  barkDuration: 0

@@ -12,17 +12,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: deefcc4a5c390194088ab15105355405, type: 3}
   m_Name: ChaserBarkData
   m_EditorClassIdentifier: 
+  aiName: Enemy
+  bubbleColor: {r: 1, g: 1, b: 1, a: 1}
   playerSpottedLines:
   - Target in my sights
   - Runner wont be around much longer
   - Guess we can call it a day early
-  - I found you
-  occupancyBarkLines:
-  - Searching this area
-  - 'Let me look over here '
-  - Let me check out this area
-  pathPredictionLines:
-  - Direct approach is best
-  - Full speed ahead
-  - Good luck outrunning me
-  - Coming right for you
+  - I found them
+  occupancyBarkLines: []
+  pathPredictionLines: []
+  idleLines: []
+  confusedLines: []
+  idleBarkFrequency: 15
+  idleBarkProbability: 0.3
+  barkDuration: 0
