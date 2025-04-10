@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -16,9 +17,23 @@ public class TimerBehavior : MonoBehaviour
 
     public PlayerController playerController; // Reference to PlayerController for score
 
+    public GameObject WinScreen;
+    public Sound BGM;
+    public Sound WinSound;
+    public Sound TickSound;
+
+    public Text scoreText;
+    public LevelManager levelManager;
+
     void Start()
     {
         initialTime = timeRemaining;
+        InvokeRepeating("PlayTickSound", 1, 1);
+    }
+
+    private void PlayTickSound()
+    {
+        SoundController.Instance?.PlaySoundRandomPitch(TickSound, 0.01f);
     }
 
     void Update()
@@ -35,9 +50,12 @@ public class TimerBehavior : MonoBehaviour
             {
                 timeRemaining = 0;
                 timerRunning = false;
-                TimerFinished();
+                CheckForWin();
             }
         }
+
+        scoreText.text = PlayerController.GoalTilesLeft.ToString() + "/5";
+        if (PlayerController.GoalTilesLeft == 0) scoreText.color = Color.green;
     }
 
     void DisplayTime(float timeToDisplay)
@@ -63,16 +81,26 @@ public class TimerBehavior : MonoBehaviour
         }
     }
 
-    void TimerFinished()
+    public void CheckForWin()
     {
-        Debug.Log("Timer finished!");
+        if (PlayerController.GoalTilesLeft == 0)
+        {
+            StartCoroutine(TimerFinished());
+        } else
+        {
+            levelManager.DoGameOverGoalFailed();
+        }
+    }
 
-        // Save player's final score using PlayerPrefs (no extra class required)
-        PlayerPrefs.SetInt("FinalScore", playerController.GetScore());
-        PlayerPrefs.Save();
-
-        // Load your "YouWin" scene
-        SceneManager.LoadScene("YouWinScreen");
+    private IEnumerator TimerFinished()
+    {
+        SoundController.Instance?.PlaySound(WinSound);
+        SoundController.Instance?.PauseSound(BGM);
+        Time.timeScale = 0;
+        WinScreen.SetActive(true);
+        yield return new WaitForSecondsRealtime(3f);
+        Time.timeScale = 1;
+        SceneManager.LoadScene("Title Screen");
     }
 }
 

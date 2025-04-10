@@ -31,9 +31,12 @@ public class PlayerController : MonoBehaviour
     public Tile BaseTile;
     public Tile GoalTile;
 
+    public static int GoalTilesLeft;
+    public Sound GetGoalTileSound;
+
     private void Awake()
     {
-
+        GoalTilesLeft = 5;
     }
 
     private void Start()
@@ -107,6 +110,8 @@ public class PlayerController : MonoBehaviour
 
         if (tile != null && tile.name == "Goal")
         {
+            SoundController.Instance?.PlaySound(GetGoalTileSound);
+            if (GoalTilesLeft > 0) GoalTilesLeft -= 1;
             score++;
             Debug.Log($"Score: {score}");
             goalTilemap.SetTile(tilePosition, BaseTile);

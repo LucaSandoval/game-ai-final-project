@@ -1,6 +1,8 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using UnityEngine.SceneManagement;
 
 public class LevelManager : MonoBehaviour
 {
@@ -16,6 +18,13 @@ public class LevelManager : MonoBehaviour
     private GridComponent grid;
     private Tilemap tilemap;
     private GridMap gridMap;
+
+    public GameObject GameOverScreen;
+    public GameObject caughtText;
+    public GameObject goalFailedText;
+
+    public Sound BGM;
+    public Sound GameOverSound;
 
     private void Awake()
     {
@@ -37,6 +46,8 @@ public class LevelManager : MonoBehaviour
         grid = GridComponent.Instance;
         tilemap = grid.GetTilemap();
         gridMap = grid.GetGridMap();
+
+        SoundController.Instance?.PlaySound(BGM);
     }
 
     // Update is called once per frame
@@ -69,9 +80,39 @@ public class LevelManager : MonoBehaviour
                 isGameOver = true;
                 Debug.Log("Game Over! The player was caught.");
                 // functions for when game ends go here bro
+                StartCoroutine(GameOverCaught());
                 break;
             }
         }
+    }
+
+    public void DoGameOverGoalFailed()
+    {
+        StartCoroutine(GameOverGoalFailed());
+    }
+
+    private IEnumerator GameOverCaught()
+    {
+        SoundController.Instance?.PauseSound(BGM);
+        SoundController.Instance?.PlaySound(GameOverSound);
+        Time.timeScale = 0;
+        GameOverScreen.SetActive(true);
+        caughtText.SetActive(true);
+        yield return new WaitForSecondsRealtime(3f);
+        Time.timeScale = 1;
+        SceneManager.LoadScene("Title Screen");
+    }
+
+    private IEnumerator GameOverGoalFailed()
+    {
+        SoundController.Instance?.PauseSound(BGM);
+        SoundController.Instance?.PlaySound(GameOverSound);
+        Time.timeScale = 0;
+        GameOverScreen.SetActive(true);
+        goalFailedText.SetActive(true);
+        yield return new WaitForSecondsRealtime(3f);
+        Time.timeScale = 1;
+        SceneManager.LoadScene("Title Screen");
     }
 
     private void SetEnemyOccupancy() 
