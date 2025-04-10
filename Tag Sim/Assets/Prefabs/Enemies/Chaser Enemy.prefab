@@ -21,9 +21,17 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 4552031467323565417}
     - target: {fileID: -6539181653244663100, guid: 7a39e0fcf19c7c942a6a5fb300762644, type: 3}
+      propertyPath: barkCooldown
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: -6539181653244663100, guid: 7a39e0fcf19c7c942a6a5fb300762644, type: 3}
       propertyPath: speechBubblePrefab
       value: 
       objectReference: {fileID: 7514461984684339862, guid: f115e6e0a8e620b4aab88bcaaeff312e, type: 3}
+    - target: {fileID: -6539181653244663100, guid: 7a39e0fcf19c7c942a6a5fb300762644, type: 3}
+      propertyPath: 'playerLostLines.Array.data[3]'
+      value: Lost the hashbrown :(
+      objectReference: {fileID: 0}
     - target: {fileID: 598890878101453146, guid: 7a39e0fcf19c7c942a6a5fb300762644, type: 3}
       propertyPath: m_Name
       value: Chaser Enemy

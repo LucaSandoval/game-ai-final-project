@@ -25,6 +25,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 7833852084118158784}
     - target: {fileID: -6539181653244663100, guid: 7a39e0fcf19c7c942a6a5fb300762644, type: 3}
+      propertyPath: barkCooldown
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: -6539181653244663100, guid: 7a39e0fcf19c7c942a6a5fb300762644, type: 3}
       propertyPath: acknowledgmentLines.Array.size
       value: 5
       objectReference: {fileID: 0}

@@ -20,6 +20,10 @@ PrefabInstance:
       propertyPath: textBooble
       value: 
       objectReference: {fileID: 5633260942013818544}
+    - target: {fileID: -6539181653244663100, guid: 7a39e0fcf19c7c942a6a5fb300762644, type: 3}
+      propertyPath: barkCooldown
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 598890878101453146, guid: 7a39e0fcf19c7c942a6a5fb300762644, type: 3}
       propertyPath: m_Name
       value: Blocker Enemy

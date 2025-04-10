@@ -21,6 +21,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2980793692210604135}
     - target: {fileID: -6539181653244663100, guid: 7a39e0fcf19c7c942a6a5fb300762644, type: 3}
+      propertyPath: barkCooldown
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: -6539181653244663100, guid: 7a39e0fcf19c7c942a6a5fb300762644, type: 3}
       propertyPath: 'acknowledgmentLines.Array.data[2]'
       value: On my way!
       objectReference: {fileID: 0}

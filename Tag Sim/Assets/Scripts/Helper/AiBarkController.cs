@@ -177,7 +177,6 @@ public class AiBarkController : MonoBehaviour
         }
         else if (barkData != null && barkData.confusedLines != null && barkData.confusedLines.Length > 0)
         {
-            // Fall back to confused lines if available
             message = barkData.confusedLines[Random.Range(0, barkData.confusedLines.Length)];
         }
 
